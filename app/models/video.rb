@@ -1,9 +1,12 @@
+require "open-uri"
+
 class Video < Content
   store_accessor :config, :url
 
   def as_json(options = {})
     super(options).merge({
-      video_id: video_id
+      video_id: video_id,
+      video_source: video_source
     })
   end
 
@@ -47,7 +50,7 @@ class Video < Content
     elsif video_source == "vimeo"
       oembed_url = "https://vimeo.com/api/oembed.json?url=#{url}"
       begin
-        response = URI.open(oembed_url).read
+        response = OpenURI.open_uri(oembed_url).read
         data = JSON.parse(response)
         data["thumbnail_url"]
       rescue => e
