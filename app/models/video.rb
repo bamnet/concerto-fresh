@@ -36,9 +36,15 @@ class Video < Content
 
   def video_source
     if url.present?
-      if url.include?("youtube.com") || url.include?("youtu.be")
+      host = URI(url).host
+      yt_hosts = [
+        "youtube.com",
+        "www.youtube.com",
+        "youtu.be"
+      ]
+      if yt_hosts.include?(host)
         "youtube"
-      elsif url.include?("vimeo.com")
+      elsif [ "vimeo.com" ].include?(host)
         "vimeo"
       end
     end
