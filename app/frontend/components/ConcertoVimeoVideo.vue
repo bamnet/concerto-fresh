@@ -22,6 +22,7 @@ const hasDuration = computed(() => {
 });
 
 function isVimeoAPILoaded() {
+  /* global Vimeo */
   return (window.Vimeo && window.Vimeo.Player);
 }
 
@@ -68,12 +69,18 @@ onMounted(async () => {
 
 <template>
   <iframe
-    :src="videoUrl"
     ref="playerRef"
-    width="640"
-    height="360"
+    class="player"
+    type="text/html"
     frameborder="0"
-    allow="autoplay; fullscreen"
-    allowfullscreen
-  ></iframe>
+    allow="autoplay"
+    :src="videoUrl"
+  />
 </template>
+
+<style scoped>
+.player {
+  height: 100%;
+  width: 100%;
+}
+</style>
