@@ -5,7 +5,15 @@
       allow="autoplay; encrypted-media" allowfullscreen
       frameborder="0">
     </iframe>
-  </div>
+  <% elsif video.video_source == "vimeo" %>
+    <iframe id="player" class="m-auto" type="text/html" width="600" height="480"
+      src="https://player.vimeo.com/video/<%= video.video_id %>?autoplay=1&muted=1&loop=0"
+      allow="autoplay; encrypted-media" allowfullscreen
+      frameborder="0">
+    </iframe>
+  <% else %>
+    <p>Unsupported video source</p>
+  <% end %>
 
   <%= render "contents/show_details", content: video %>
 </div>
