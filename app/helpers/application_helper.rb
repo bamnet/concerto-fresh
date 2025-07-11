@@ -13,7 +13,7 @@ module ApplicationHelper
     end
 
     def sidebar_nav_link_to(text, path, icon_name)
-        css = "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 "
+        css = "group flex items-center px-2 py-1 text-sm font-medium rounded-md transition-colors duration-200 "
         aria = {}
 
         if current_page?(path)
@@ -27,7 +27,7 @@ module ApplicationHelper
 
         link_to(path, class: css, aria: aria) do
             content_tag(:div, class: "flex items-center") do
-                heroicon(icon_name, class: "w-5 h-5 mr-3 #{icon_css}") +
+                heroicon(icon_name, class: "w-4 h-4 mr-2 #{icon_css}") +
                 content_tag(:span, text, data: { sidebar_target: "linkText" })
             end
         end

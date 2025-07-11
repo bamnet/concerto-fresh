@@ -5,7 +5,7 @@
      data-sidebar-collapsed-class="-translate-x-full lg:w-18">
   
   <!-- Sidebar Header with Logo -->
-  <div class="flex h-16 items-center justify-between px-6 border-b border-neutral-700">
+  <div class="flex h-16 items-center justify-between px-4 border-b border-neutral-700">
     <div class="flex items-center">
       <%= image_tag("logomark.png", class: "w-8 h-8", alt: "Concerto") %>
       <span class="ml-3 text-white font-semibold text-lg" data-sidebar-target="logoText">Concerto</span>
@@ -20,11 +20,11 @@
   </div>
 
   <!-- Navigation -->
-  <nav class="flex-1 px-4 py-6 space-y-8">
+  <nav class="flex-1 px-3 py-4 space-y-6">
     
     <!-- Content Section -->
     <div>
-      <h3 class="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3" data-sidebar-target="sectionTitle">
+      <h3 class="px-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2" data-sidebar-target="sectionTitle">
         Content
       </h3>
       <div class="space-y-1">
@@ -39,7 +39,7 @@
 
     <!-- Network Section -->
     <div>
-      <h3 class="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3" data-sidebar-target="sectionTitle">
+      <h3 class="px-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2" data-sidebar-target="sectionTitle">
         Network
       </h3>
       <div class="space-y-1">
@@ -53,7 +53,7 @@
     <!-- Administration Section -->
     <% if user_signed_in? %>
     <div>
-      <h3 class="px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3" data-sidebar-target="sectionTitle">
+      <h3 class="px-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2" data-sidebar-target="sectionTitle">
         Administration
       </h3>
       <div class="space-y-1">
@@ -67,9 +67,9 @@
   </nav>
 
   <!-- Sidebar Footer with Collapse Toggle -->
-  <div class="border-t border-neutral-700 p-4">
+  <div class="border-t border-neutral-700 p-3">
     <button type="button" 
-            class="hidden lg:flex w-full items-center justify-center px-3 py-2 text-sm text-neutral-300 hover:text-white hover:bg-neutral-700 rounded-md transition-colors"
+            class="hidden lg:flex w-full items-center justify-center px-2 py-1 text-sm text-neutral-300 hover:text-white hover:bg-neutral-700 rounded-md transition-colors"
             data-action="sidebar#toggleCollapse"
             data-sidebar-target="collapseButton">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-sidebar-target="collapseIcon">

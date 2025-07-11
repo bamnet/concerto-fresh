@@ -27,13 +27,10 @@
   --color-error: #DC3545;
   --color-info: #17A2B8;
 
-  /* Spacing System (8px-based) */
-  --spacing-1: 8px;
-  --spacing-2: 16px;
-  --spacing-3: 24px;
-  --spacing-4: 32px;
-  --spacing-5: 40px;
-  --spacing-6: 48px;
+  /* Note: Using Tailwind's default spacing scale (4px-based)
+   * 1 = 4px, 2 = 8px, 3 = 12px, 4 = 16px, 5 = 20px, 6 = 24px
+   * This aligns with modern design systems and avoids conflicts
+   */
 
   /* Typography Scale */
   --font-size-h1: 2rem;
@@ -167,18 +164,18 @@
 }
 
 @utility btn-sm {
-  @apply px-3 py-2 text-sm;
-  height: 32px;
+  @apply px-2 py-1 text-sm;
+  height: 28px;
 }
 
 @utility btn-md {
-  @apply px-4 py-2 text-sm;
-  height: 40px;
+  @apply px-3 py-2 text-sm;
+  height: 36px;
 }
 
 @utility btn-lg {
-  @apply px-6 py-3 text-base;
-  height: 48px;
+  @apply px-3 py-2 text-base;
+  height: 40px;
 }
 
 /* Card Components */
@@ -187,15 +184,15 @@
 }
 
 @utility card-header {
-  @apply px-6 py-4 border-b border-neutral-200;
+  @apply px-3 py-2 border-b border-neutral-200;
 }
 
 @utility card-body {
-  @apply px-6 py-4;
+  @apply px-3 py-2;
 }
 
 @utility card-footer {
-  @apply px-6 py-4 border-t border-neutral-200;
+  @apply px-3 py-2 border-t border-neutral-200;
 }
 
 /* Table Components */
@@ -246,24 +243,18 @@
 }
 
 @utility modal-header {
-  @apply px-6 py-4 border-b border-neutral-200 flex items-center justify-between;
+  @apply px-4 py-3 border-b border-neutral-200 flex items-center justify-between;
 }
 
 @utility modal-body {
-  @apply px-6 py-6;
+  @apply px-4 py-4;
 }
 
 @utility modal-footer {
-  @apply px-6 py-4 border-t border-neutral-200 flex justify-end space-x-3;
+  @apply px-4 py-3 border-t border-neutral-200 flex justify-end space-x-3;
 }
 
-/* Spacing Utilities */
-@utility space-1 { @apply p-2; }
-@utility space-2 { @apply p-4; }
-@utility space-3 { @apply p-6; }
-@utility space-4 { @apply p-8; }
-@utility space-5 { @apply p-10; }
-@utility space-6 { @apply p-12; }
+/* Custom spacing utilities removed - using Tailwind's default spacing scale */
 
 /* Text Utilities */
 @utility line-clamp-2 {
@@ -282,7 +273,7 @@
 
 /* Navigation Utilities */
 @utility nav-link {
-  @apply group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200;
+  @apply group flex items-center px-2 py-1 text-sm font-medium rounded-md transition-colors duration-200;
 }
 
 @utility nav-link-active {
@@ -298,6 +289,9 @@
 @utility icon-md { @apply w-5 h-5; }
 @utility icon-lg { @apply w-6 h-6; }
 @utility icon-xl { @apply w-8 h-8; }
+
+/* Sidebar specific icon size */
+@utility icon-sidebar { @apply w-4 h-4; }
 
 /* Aspect Ratio Utilities */
 @utility aspect-video {
