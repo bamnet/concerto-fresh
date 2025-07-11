@@ -284,14 +284,7 @@
   @apply nav-link text-neutral-300 hover:bg-neutral-700 hover:text-white;
 }
 
-/* Icon Utilities */
-@utility icon-sm { @apply w-4 h-4; }
-@utility icon-md { @apply w-5 h-5; }
-@utility icon-lg { @apply w-6 h-6; }
-@utility icon-xl { @apply w-8 h-8; }
-
-/* Sidebar specific icon size */
-@utility icon-sidebar { @apply w-4 h-4; }
+/* Icon utilities removed - using Tailwind classes directly (w-4 h-4, w-5 h-5, etc.) */
 
 /* Aspect Ratio Utilities */
 @utility aspect-video {
