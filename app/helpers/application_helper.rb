@@ -28,7 +28,7 @@ module ApplicationHelper
         link_to(path, class: css, aria: aria) do
             content_tag(:div, class: "flex items-center") do
                 heroicon(icon_name, class: "w-4 h-4 mr-2 #{icon_css}") +
-                content_tag(:span, text, data: { sidebar_target: "linkText" })
+                content_tag(:span, text)
             end
         end
     end

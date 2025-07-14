@@ -1,11 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["sidebar", "overlay", "logoText", "sectionTitle", "linkText", "collapseButton", "collapseIcon", "collapseText"]
-  static classes = ["expanded", "collapsed"]
+  static targets = ["sidebar", "overlay"]
+  static classes = []
 
   connect() {
-    this.isCollapsed = false
     this.isMobileOpen = false
   }
 
@@ -37,101 +36,6 @@ export default class extends Controller {
     document.body.style.overflow = ""
   }
 
-  toggleCollapse() {
-    this.isCollapsed = !this.isCollapsed
-    
-    if (this.isCollapsed) {
-      this.collapse()
-    } else {
-      this.expand()
-    }
-  }
-
-  collapse() {
-    // Update sidebar width
-    this.sidebarTarget.classList.remove("w-72")
-    this.sidebarTarget.classList.add("w-18")
-    
-    // Hide text elements
-    this.logoTextTargets.forEach(target => {
-      target.style.display = "none"
-    })
-    
-    this.sectionTitleTargets.forEach(target => {
-      target.style.display = "none"
-    })
-    
-    this.linkTextTargets.forEach(target => {
-      target.style.display = "none"
-    })
-    
-    // Update collapse button
-    if (this.hasCollapseTextTarget) {
-      this.collapseTextTarget.textContent = "Expand"
-    }
-    
-    if (this.hasCollapseIconTarget) {
-      this.collapseIconTarget.innerHTML = `
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
-      `
-    }
-    
-    // Add tooltip functionality for collapsed state
-    this.addTooltips()
-  }
-
-  expand() {
-    // Update sidebar width
-    this.sidebarTarget.classList.remove("w-18")
-    this.sidebarTarget.classList.add("w-72")
-    
-    // Show text elements
-    this.logoTextTargets.forEach(target => {
-      target.style.display = ""
-    })
-    
-    this.sectionTitleTargets.forEach(target => {
-      target.style.display = ""
-    })
-    
-    this.linkTextTargets.forEach(target => {
-      target.style.display = ""
-    })
-    
-    // Update collapse button
-    if (this.hasCollapseTextTarget) {
-      this.collapseTextTarget.textContent = "Collapse"
-    }
-    
-    if (this.hasCollapseIconTarget) {
-      this.collapseIconTarget.innerHTML = `
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
-      `
-    }
-    
-    // Remove tooltips
-    this.removeTooltips()
-  }
-
-  addTooltips() {
-    // Add tooltip functionality for collapsed sidebar
-    this.linkTextTargets.forEach(target => {
-      const link = target.closest('a')
-      if (link) {
-        link.setAttribute('title', target.textContent)
-      }
-    })
-  }
-
-  removeTooltips() {
-    // Remove tooltip functionality
-    this.linkTextTargets.forEach(target => {
-      const link = target.closest('a')
-      if (link) {
-        link.removeAttribute('title')
-      }
-    })
-  }
 
   // Handle window resize
   handleResize() {
