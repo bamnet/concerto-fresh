@@ -28,9 +28,6 @@
         <%= sidebar_nav_link_to "Dashboard", "/", "home" %>
         <%= sidebar_nav_link_to "Add Content", new_content_path, "plus" %>
         <%= sidebar_nav_link_to "Browse Content", contents_path, "collection" %>
-        <%= sidebar_nav_link_to "Graphics", graphics_path, "photograph" %>
-        <%= sidebar_nav_link_to "Rich Text", rich_texts_path, "document-text" %>
-        <%= sidebar_nav_link_to "Videos", videos_path, "play" %>
       </div>
     </div>
 
@@ -41,9 +38,7 @@
       </h3>
       <div class="space-y-1">
         <%= sidebar_nav_link_to "Feeds", feeds_path, "rss" %>
-        <%= sidebar_nav_link_to "RSS Feeds", rss_feeds_path, "globe-alt" %>
         <%= sidebar_nav_link_to "Screens", screens_path, "desktop-computer" %>
-        <%= sidebar_nav_link_to "Templates", templates_path, "template" %>
       </div>
     </div>
 
@@ -54,6 +49,7 @@
         Administration
       </h3>
       <div class="space-y-1">
+        <%= sidebar_nav_link_to "Templates", templates_path, "template" %>
         <%= sidebar_nav_link_to "Settings", admin_settings_path, "cog" %>
         <%= sidebar_nav_link_to "Users", "#", "users" %>
         <%= sidebar_nav_link_to "System", "#", "server" %>

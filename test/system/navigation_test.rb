@@ -49,13 +49,8 @@ class NavigationTest < ApplicationSystemTestCase
       assert_link "Dashboard", href: "/"
       assert_link "Add Content", href: new_content_path
       assert_link "Browse Content", href: contents_path
-      assert_link "Graphics", href: graphics_path
-      assert_link "Rich Text", href: rich_texts_path
-      assert_link "Videos", href: videos_path
       assert_link "Feeds", href: feeds_path
-      assert_link "RSS Feeds", href: rss_feeds_path
       assert_link "Screens", href: screens_path
-      assert_link "Templates", href: templates_path
     end
   end
 
@@ -71,6 +66,7 @@ class NavigationTest < ApplicationSystemTestCase
     assert_selector "[data-sidebar-target='sidebar']" do
       assert_text "ADMINISTRATION"
       assert_link "Settings", href: admin_settings_path
+      assert_link "Templates", href: templates_path
       assert_link "Users"
       assert_link "System"
     end
