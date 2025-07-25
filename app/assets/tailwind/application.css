@@ -139,6 +139,16 @@
   @apply border-error focus:border-error focus:ring-red-100;
 }
 
+@utility frm-file-input {
+  @apply block w-full bg-white border border-neutral-300 text-neutral-900 rounded-lg px-3 py-2;
+  @apply focus:border-brand focus:ring-3 focus:ring-brand-100 focus:outline-none;
+  @apply disabled:bg-neutral-100 disabled:border-neutral-300 disabled:text-neutral-500;
+  @apply file:mr-3 file:px-4 file:py-2 file:bg-neutral-200 file:border file:border-neutral-300;
+  @apply file:rounded-lg file:text-neutral-900 file:font-medium file:cursor-pointer;
+  @apply file:hover:bg-neutral-300 file:hover:border-neutral-500 file:hover:shadow-lg;
+  @apply file:transition-all file:duration-200;
+}
+
 /* Button Components */
 @utility btn {
   @apply inline-flex items-center justify-center rounded-lg px-4 py-2 font-medium transition-all duration-200;
