@@ -35,13 +35,12 @@
         </div>
         <input type="search" 
                placeholder="Search content..." 
-               class="frm-input pl-10 pr-4 py-2 w-64 text-sm"
-               data-controller="search"
-               data-action="input->search#query">
+               class="frm-input pl-10 pr-4 py-2 w-64 text-sm">
+               <!-- TODO: Implement Search -->
       </div>
 
       <!-- Quick action: New Content -->
-      <%= link_to new_content_path, class: "btn-primary btn-sm hidden sm:inline-flex" do %>
+      <%= link_to new_content_path, class: "btn-primary btn-md hidden sm:inline-flex" do %>
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
@@ -102,7 +101,7 @@
           </div>
         </div>
       <% else %>
-        <%= link_to "Sign In", new_user_session_path, class: "btn-primary btn-sm" %>
+        <%= link_to "Sign In", new_user_session_path, class: "btn-primary btn-md" %>
       <% end %>
 
     </div>
