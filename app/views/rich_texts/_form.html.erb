@@ -1,31 +1,33 @@
-<%= form_with(model: rich_text) do |form| %>
-<div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-  <% if rich_text.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(rich_text.errors.count, "error") %> prohibited this rich_text from being saved:</h2>
+<div class="max-w-2xl">
+  <%= form_with(model: rich_text) do |form| %>
+  <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+    <% if rich_text.errors.any? %>
+      <div class="sm:col-span-full bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <h2 class="font-medium mb-2"><%= pluralize(rich_text.errors.count, "error") %> prohibited this rich_text from being saved:</h2>
 
-      <ul>
-        <% rich_text.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
+        <ul class="list-disc list-inside space-y-1">
+          <% rich_text.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="sm:col-span-2">
+      <%= form.label :render_as, "Type", class: "frm-label" %>
+      <%= form.select :render_as, RichText.render_as, class: "frm-input" %>
     </div>
+
+    <div class="sm:col-span-full">
+      <%= form.label :text, class: "frm-label" %>
+      <%= form.text_area :text, class: "frm-input", rows: 6 %>
+    </div>
+
+    <%= render "contents/form", form: form %>
+
+    <div class="sm:col-span-full">
+      <%= form.submit class: "btn-primary" %>
+    </div>
+  </div>
   <% end %>
-
-  <div class="sm:col-span-2">
-    <%= form.label :render_as, "Type", class: "frm-label" %>
-    <%= form.select :render_as, RichText.render_as, class: "frm-input" %>
-  </div>
-
-  <div class="sm:col-span-full">
-    <%= form.label :text, class: "frm-label" %>
-    <%= form.text_area :text, class: "frm-input" %>
-  </div>
-
-  <%= render "contents/form", form: form %>
-
-  <div>
-    <%= form.submit class: "btn" %>
-  </div>
 </div>
-<% end %>
