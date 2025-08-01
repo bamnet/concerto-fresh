@@ -16,12 +16,6 @@
               <span class="capitalize"><%= content.class.name.downcase %></span>
               <span><%= time_ago_in_words(content.created_at) %> ago</span>
             </div>
-            
-            <% if content.respond_to?(:description) && content.description.present? %>
-              <p class="text-body text-neutral-700 line-clamp-2">
-                <%= truncate(content.description, length: 100) %>
-              </p>
-            <% end %>
           </div>
         </div>
       </div>
