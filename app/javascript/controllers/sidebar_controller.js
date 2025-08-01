@@ -2,7 +2,6 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["sidebar", "overlay"]
-  static classes = []
 
   connect() {
     this.isMobileOpen = false
@@ -17,6 +16,8 @@ export default class extends Controller {
   }
 
   open() {
+    if (!this.hasSidebarTarget || !this.hasOverlayTarget) return
+    
     this.isMobileOpen = true
     this.sidebarTarget.classList.remove("-translate-x-full")
     this.sidebarTarget.classList.add("translate-x-0")
