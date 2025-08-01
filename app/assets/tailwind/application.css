@@ -183,43 +183,13 @@
   height: 36px;
 }
 
-@utility btn-lg {
-  @apply px-3 py-2 text-base;
-  height: 40px;
-}
-
 /* Card Components */
 @utility card {
   @apply bg-white rounded-lg border border-neutral-200 shadow-sm;
 }
 
-@utility card-header {
-  @apply px-3 py-2 border-b border-neutral-200;
-}
-
 @utility card-body {
   @apply px-3 py-2;
-}
-
-@utility card-footer {
-  @apply px-3 py-2 border-t border-neutral-200;
-}
-
-/* Table Components */
-@utility table-container {
-  @apply overflow-hidden rounded-lg border border-neutral-200;
-}
-
-@utility table-header {
-  @apply bg-neutral-100 text-neutral-700 font-semibold;
-}
-
-@utility table-row {
-  @apply bg-white hover:bg-neutral-50 border-b border-neutral-200 last:border-b-0;
-}
-
-@utility table-cell {
-  @apply px-4 py-4 text-body;
 }
 
 /* Alert Components */
@@ -227,41 +197,12 @@
   @apply rounded-lg p-4 flex items-start space-x-3;
 }
 
-@utility alert-info {
-  @apply alert bg-brand-100 text-brand-900;
-}
-
 @utility alert-success {
   @apply alert bg-green-100 text-green-800;
 }
 
-@utility alert-warning {
-  @apply alert bg-yellow-100 text-yellow-800;
-}
-
 @utility alert-error {
   @apply alert bg-red-100 text-red-800;
-}
-
-/* Modal Components */
-@utility modal-overlay {
-  @apply fixed inset-0 bg-neutral-900/50 backdrop-blur-sm z-50;
-}
-
-@utility modal-container {
-  @apply bg-white rounded-3xl shadow-2xl max-w-lg w-full mx-4;
-}
-
-@utility modal-header {
-  @apply px-4 py-3 border-b border-neutral-200 flex items-center justify-between;
-}
-
-@utility modal-body {
-  @apply px-4 py-4;
-}
-
-@utility modal-footer {
-  @apply px-4 py-3 border-t border-neutral-200 flex justify-end space-x-3;
 }
 
 /* Custom spacing utilities removed - using Tailwind's default spacing scale */
@@ -279,32 +220,4 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
-}
-
-/* Navigation Utilities */
-@utility nav-link {
-  @apply group flex items-center px-2 py-1 text-sm font-medium rounded-md transition-colors duration-200;
-}
-
-@utility nav-link-active {
-  @apply nav-link bg-brand-100 text-brand border-l-4 border-brand;
-}
-
-@utility nav-link-inactive {
-  @apply nav-link text-neutral-300 hover:bg-neutral-700 hover:text-white;
-}
-
-/* Icon utilities removed - using Tailwind classes directly (w-4 h-4, w-5 h-5, etc.) */
-
-/* Aspect Ratio Utilities */
-@utility aspect-video {
-  aspect-ratio: 16 / 9;
-}
-
-@utility aspect-square {
-  aspect-ratio: 1 / 1;
-}
-
-@utility aspect-4-3 {
-  aspect-ratio: 4 / 3;
 }
