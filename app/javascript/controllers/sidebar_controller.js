@@ -28,6 +28,8 @@ export default class extends Controller {
   }
 
   close() {
+    if (!this.hasSidebarTarget || !this.hasOverlayTarget) return
+
     this.isMobileOpen = false
     this.sidebarTarget.classList.add("-translate-x-full")
     this.sidebarTarget.classList.remove("translate-x-0")
