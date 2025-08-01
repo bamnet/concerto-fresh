@@ -313,7 +313,3 @@
   position: relative;
 }
 
-/* Group hover styles using regular CSS */
-.group:hover .group-hover-text-brand {
-  color: var(--color-brand-blue);
-}
