@@ -308,8 +308,3 @@
 @utility aspect-4-3 {
   aspect-ratio: 4 / 3;
 }
-/* Group utility for hover states */
-@utility group {
-  position: relative;
-}
-
