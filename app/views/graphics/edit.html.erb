@@ -1,28 +1,6 @@
-<div class="min-h-screen bg-gray-50">
-  <div class="max-w-4xl mx-auto">
-    <!-- Page Header -->
-    <div class="mb-4">
-      <nav class="flex items-center space-x-2 text-sm text-gray-500 mb-4">
-        <%= link_to "Content", contents_path, class: "hover:text-gray-700" %>
-        <%= heroicon("chevron") %>
-        <%= link_to @graphic.name.presence || "Graphic", @graphic, class: "hover:text-gray-700" %>
-        <%= heroicon("chevron") %>
-        <span class="text-gray-900 font-medium">Edit</span>
-      </nav>
-      
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">Edit Graphic Content</h1>
-          <p class="text-gray-600 mt-1">Update the settings and configuration for this graphic</p>
-        </div>
-        <div class="flex space-x-3">
-          <%= link_to "View Content", @graphic,
-              class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-        </div>
-      </div>
-    </div>
-
-    <!-- Form -->
-    <%= render "form", graphic: @graphic %>
-  </div>
-</div>
+<%= render "contents/form_layout",
+    content: @graphic,
+    content_name: "Graphic",
+    page_title: "Edit #{@graphic.name}",
+    page_description: "Update the settings and configuration for this graphic",
+    form_locals: { graphic: @graphic } %>
