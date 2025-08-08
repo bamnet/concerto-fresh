@@ -66,15 +66,9 @@
           <% end %>
         </dd>
       </div>
-      
-      <!-- Additional content from yield -->
-      <% if content_for?(:additional_details) %>
-        <div class="border-t border-neutral-200 pt-6">
-          <%= yield %>
-        </div>
-      <% else %>
-        <%= yield %>
-      <% end %>
+
+      <!-- Addtional Content type form fields-->
+      <%= yield %>
     </dl>
   </div>
 </div>
