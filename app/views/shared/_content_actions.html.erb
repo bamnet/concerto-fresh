@@ -10,13 +10,12 @@
       </div>
       
       <div class="flex-shrink-0">
-        <%= button_to "Destroy this #{content_type}", destroy_path, 
+        <%= button_to "Destroy this #{content_type}", destroy_path,
             method: :delete,
             class: "btn btn-danger",
             form_class: "inline-block",
-            data: { 
-              confirm: "Are you sure you want to delete this #{content_type}? This action cannot be undone.",
-              turbo_method: :delete 
+            data: {
+              turbo_confirm: "Are you sure you want to delete this #{content_type}? This action cannot be undone."
             } %>
       </div>
     </div>
