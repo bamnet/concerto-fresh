@@ -2,42 +2,32 @@
   <%= content.text %>
 <% else %>
 <div data-controller="rich-text-preview">
-  <div data-rich-text-preview-target="content" style="max-height: 200px; overflow: hidden;">
-    <template shadowrootmode="open">
-      <style>
-        /* The :host is the shadow DOM's root. It acts as the viewport for our scaled content. */
-        :host {
-          all: initial;
-          display: block;
-          /* Hide anything from the scaled-up inner container that might spill out */
-          overflow: hidden;
-        }
-        /* This container will be scaled down. We make it larger so that when it's
-           scaled, its content (like text) reflows correctly for the smaller :host size. */
-        .scaler {
-          --scale-factor: 0.75; /* Adjust this value to control the size */
-          transform: scale(var(--scale-factor));
-          transform-origin: top left;
-          width: calc(100% / var(--scale-factor));
-          height: calc(100% / var(--scale-factor));
-        }
+  <template shadowrootmode="open">
+    <style>
+      /* The :host is the shadow DOM's root. It acts as the viewport for our scaled content. */
+      :host {
+        all: initial;
+        display: block;
+        /* Hide anything from the scaled-up inner container that might spill out */
+        overflow: hidden;
+      }
+      /* This container will be scaled down. We make it larger so that when it's
+         scaled, its content (like text) reflows correctly for the smaller :host size. */
+      .scaler {
+        --scale-factor: 0.75; /* Adjust this value to control the size */
+        transform: scale(var(--scale-factor));
+        transform-origin: top left;
+        width: calc(100% / var(--scale-factor));
+        height: calc(100% / var(--scale-factor));
+      }
 
-        h1, h2, h3 {
-          font-weight: 500;
-        }
-      </style>
-      <div class="scaler">
-          <%= sanitize(content.text).html_safe %>
-      </div>
-    </template>
-  </div>
-  <button
-    data-rich-text-preview-target="expandButton"
-    data-action="rich-text-preview#toggle"
-    class="btn btn-secondary btn-sm mx-auto my-2"
-    style="display: none;"
-  >
-    Show More
-  </button>
+      h1, h2, h3 {
+        font-weight: 500;
+      }
+    </style>
+    <div class="scaler">
+        <%= sanitize(content.text).html_safe %>
+    </div>
+  </template>
 </div>
 <% end %>
