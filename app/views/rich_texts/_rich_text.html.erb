@@ -6,7 +6,7 @@
         <% if rich_text.plaintext? %>
           <%= rich_text.text %>
         <% else %>
-          <%= sanitize(rich_text.text).html_safe %>
+          <%= sanitize(rich_text.text) %>
         <% end %>
       </div>
     </div>
