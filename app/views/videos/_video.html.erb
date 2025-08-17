@@ -6,7 +6,6 @@
         <% if video.video_source == "youtube" %>
           <iframe
                   class="rounded-lg shadow-sm border border-neutral-200"
-                  type="text/html"
                   width="600"
                   height="480"
                   src="https://www.youtube-nocookie.com/embed/<%= video.video_id %>?rel=0&iv_load_policy=3"
@@ -17,7 +16,6 @@
         <% elsif video.video_source == "vimeo" %>
           <iframe
                   class="rounded-lg shadow-sm border border-neutral-200"
-                  type="text/html"
                   width="600"
                   height="480"
                   src="https://player.vimeo.com/video/<%= video.video_id %>"
