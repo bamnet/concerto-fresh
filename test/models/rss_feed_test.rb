@@ -77,4 +77,28 @@ class RssFeedTest < ActiveSupport::TestCase
     assert_empty content[1].text
     assert_operator content[1].end_time, :<, Time.now
   end
+
+  test "parses details from a simple RSS feed" do
+    @feed.formatter = "details"
+    mock_file = File.read("test/support/basic_rss_feed.xml")
+
+    mock = Minitest::Mock.new
+    mock.expect(:open, mock_file)
+
+    URI.stub(:parse, mock) do
+      items = @feed.new_items
+      assert_equal items.length, 10
+
+      assert_equal items[0], [
+        "<h1>Item 1 Title</h1>",
+        "<p>Description for Item 1</p>"
+      ].join()
+
+      assert_equal items[1], [
+        "<h1>Item 2 Title</h1>",
+        "<p>Description for Item 2</p>"
+      ].join()
+    end
+    mock.verify
+  end
 end
