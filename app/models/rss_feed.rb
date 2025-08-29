@@ -71,12 +71,13 @@ class RssFeed < Feed
 
         if details?
           items.each do |item|
-            contents << "<h1>#{item[:title]}</h1><p>#{item[:description]}</p>"
+            description = ActionController::Base.helpers.sanitize(item[:description])
+            contents << "<h1>#{CGI.escapeHTML(item[:title])}</h1><p>#{description}</p>"
           end
         else # headlines
           items.each_slice(5).with_index do |slice, index|
-            item_titles = slice.map { |i| i[:title] }
-            contents << "<h1>#{title}</h1><h2>#{item_titles.join("</h2><h2>")}</h2>"
+            item_titles = slice.map { |i| CGI.escapeHTML(i[:title]) }
+            contents << "<h1>#{CGI.escapeHTML(title)}</h1><h2>#{item_titles.join("</h2><h2>")}</h2>"
           end
         end
 

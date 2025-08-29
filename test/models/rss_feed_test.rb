@@ -19,7 +19,7 @@ class RssFeedTest < ActiveSupport::TestCase
       assert_equal items[0], [
         "<h1>Yahoo News - Latest News &amp; Headlines</h1>",
         "<h2>Item 1 Title</h2>",
-        "<h2>Item 2 Title</h2>",
+        "<h2>Item 2 Title &amp; is fancy</h2>",
         "<h2>Item 3 Title</h2>",
         "<h2>Item 4 Title</h2>",
         "<h2>Item 5 Title</h2>" ].join()
@@ -95,8 +95,8 @@ class RssFeedTest < ActiveSupport::TestCase
       ].join()
 
       assert_equal items[1], [
-        "<h1>Item 2 Title</h1>",
-        "<p>Description for Item 2</p>"
+        "<h1>Item 2 Title &amp; is fancy</h1>",
+        "<p>Description for Item 2 &amp; too!</p>"
       ].join()
     end
     mock.verify

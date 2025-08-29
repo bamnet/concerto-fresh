@@ -20,8 +20,8 @@
 			<description>Description for Item 1</description>
 		</item>
 		<item>
-			<title>Item 2 Title</title>
-			<description>Description for Item 2</description>
+			<title>Item 2 Title &amp; is fancy</title>
+			<description>Description for Item 2 &amp; too!</description>
 		</item>
 		<item>
 			<title>Item 3 Title</title>
