@@ -20,7 +20,7 @@ class RssFeedsTest < ApplicationSystemTestCase
 
   test "should update Rss feed" do
     visit rss_feed_url(@rss_feed)
-    click_on "Edit this rss feed", match: :first
+    click_on "Edit RSS Feed", match: :first
 
     fill_in "Name", with: @rss_feed.name
     fill_in "Description", with: @rss_feed.description
@@ -33,7 +33,9 @@ class RssFeedsTest < ApplicationSystemTestCase
 
   test "should destroy Rss feed" do
     visit rss_feed_url(@rss_feed)
-    click_on "Destroy this rss feed", match: :first
+    page.accept_confirm do
+      click_on "Destroy this RSS Feed", match: :first
+    end
 
     assert_text "RSS Feed was successfully destroyed"
   end
