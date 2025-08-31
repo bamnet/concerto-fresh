@@ -76,9 +76,18 @@
               <%= pluralize(@rss_feed.content.used.count, 'current item') %>
             </span>
             <% if @rss_feed.content.unused.count > 0 %>
-              <span class="text-caption text-neutral-500 bg-neutral-100 px-2 py-1 rounded">
-                <%= pluralize(@rss_feed.content.unused.count, 'unused item') %>
-              </span>
+              <div class="flex items-center gap-2">
+                <span class="text-caption text-neutral-500 bg-neutral-100 px-2 py-1 rounded">
+                  <%= pluralize(@rss_feed.content.unused.count, 'unused item') %>
+                </span>
+                <%= button_to "Clean Up", cleanup_rss_feed_path(@rss_feed),
+                    method: :delete,
+                    class: "btn btn-sm btn-secondary",
+                    form_class: "inline-block",
+                    data: {
+                      turbo_confirm: "Are you sure you want to delete all unused content? This action cannot be undone."
+                    } %>
+              </div>
             <% end %>
           </div>
         </div>
