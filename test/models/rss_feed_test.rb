@@ -101,4 +101,28 @@ class RssFeedTest < ActiveSupport::TestCase
     end
     mock.verify
   end
+
+  test "refresh creates used and unused content correctly" do
+    feed = RssFeed.create(name: "Test Feed")
+
+    # Create content then refresh with fewer items to create unused content
+    feed.stub :new_items, [ "Item 1", "Item 2", "Item 3" ] do
+      feed.refresh
+    end
+
+    feed.stub :new_items, [ "Updated Item 1" ] do
+      feed.refresh
+    end
+
+    # Should have 1 used, 2 unused content items
+    assert_equal 1, feed.content.used.count
+    assert_equal 2, feed.content.unused.count
+
+    # Used content should have text, unused should be empty with "(unused)" name
+    assert_equal "Updated Item 1", feed.content.used.first.text
+    feed.content.unused.each do |content|
+      assert_empty content.text
+      assert content.name.include?("(unused)")
+    end
+  end
 end
