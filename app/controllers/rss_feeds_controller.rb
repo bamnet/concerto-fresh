@@ -21,6 +21,7 @@ class RssFeedsController < ApplicationController
     respond_to do |format|
       if @rss_feed.save
         format.html { redirect_to rss_feed_url(@rss_feed), notice: "RSS Feed was successfully created." }
+        format.html { redirect_to rss_feed_url(@rss_feed), notice: "RSS Feed was successfully created." }
         format.json { render :show, status: :created, location: @rss_feed }
       else
         format.html { render :new, status: :unprocessable_entity }
