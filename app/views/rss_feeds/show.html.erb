@@ -75,7 +75,7 @@
             <span class="text-caption text-neutral-700">
               <%= pluralize(@rss_feed.content.used.count, 'current item') %>
             </span>
-            <% if @rss_feed.content.unused.count > 0 %>
+            <% if @rss_feed.content.unused.exists? %>
               <div class="flex items-center gap-2">
                 <span class="text-caption text-neutral-500 bg-neutral-100 px-2 py-1 rounded">
                   <%= pluralize(@rss_feed.content.unused.count, 'unused item') %>
@@ -93,7 +93,7 @@
         </div>
       </div>
 
-      <% if @rss_feed.content.used.empty? %>
+      <% unless @rss_feed.content.used.exists? %>
         <div class="text-center py-12">
           <div class="text-neutral-500 mb-4">
             <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
