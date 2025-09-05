@@ -29,7 +29,7 @@ class FeedsTest < ApplicationSystemTestCase
 
     fill_in "Description", with: @feed.description
     fill_in "Name", with: @feed.name
-    click_on "Create Feed"
+    click_on "Save Feed"
 
     assert_text "Feed was successfully created"
     click_on "Back"
@@ -41,7 +41,7 @@ class FeedsTest < ApplicationSystemTestCase
 
     fill_in "Description", with: @feed.description
     fill_in "Name", with: @feed.name
-    click_on "Update Feed"
+    click_on "Save Feed"
 
     assert_text "Feed was successfully updated"
     click_on "Back"
