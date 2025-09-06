@@ -15,8 +15,8 @@ class ScreensTest < ApplicationSystemTestCase
     click_on "New Screen"
 
     fill_in "Name", with: @screen.name
-    select @screen.template.name, from: "Template"
-    click_on "Create Screen"
+    find("label", text: @screen.template.name).click
+    click_on "Save Screen"
 
     assert_text "Screen was successfully created"
     click_on "Back"
@@ -27,8 +27,8 @@ class ScreensTest < ApplicationSystemTestCase
     click_on "Edit this screen", match: :first
 
     fill_in "Name", with: @screen.name
-    select @screen.template.name, from: "Template"
-    click_on "Update Screen"
+    find("label", text: @screen.template.name).click
+    click_on "Save Screen"
 
     assert_text "Screen was successfully updated"
     click_on "Back"
