@@ -24,7 +24,7 @@ class ScreensTest < ApplicationSystemTestCase
 
   test "should update Screen" do
     visit screen_url(@screen)
-    click_on "Edit this screen", match: :first
+    click_on "Edit Screen", match: :first
 
     fill_in "Name", with: @screen.name
     find("label", text: @screen.template.name).click
@@ -36,7 +36,7 @@ class ScreensTest < ApplicationSystemTestCase
 
   test "should destroy Screen" do
     visit screen_url(@screen)
-    click_on "Destroy this screen", match: :first
+    click_on "Delete Screen", match: :first
 
     assert_text "Screen was successfully destroyed"
   end
