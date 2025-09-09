@@ -9,8 +9,8 @@
         <p class="text-sm text-gray-600 mt-1">Manage screen configuration and feed subscriptions</p>
       </div>
       <div class="flex space-x-3">
-        <%= link_to "View in Player", frontend_player_path(@screen), class: "btn-secondary" %>
-        <%= link_to "Edit Screen", edit_screen_path(@screen), class: "btn-primary" %>
+        <%= link_to "Manage Subscriptions", screen_subscriptions_url(@screen), class: "btn-primary" %>
+        <%= link_to "Edit Screen", edit_screen_path(@screen), class: "btn-secondary" %>
       </div>
     </div>
   </div>
@@ -38,6 +38,11 @@
           <% end %>
         </div>
       </div>
+
+      <!-- View in Player Section -->
+      <div class="mt-6">
+        <%= link_to "View in Player", frontend_player_path(@screen), class: "btn-secondary" %>
+      </div>
     </div>
 
     <!-- Subscriptions Management Section -->
@@ -49,7 +54,7 @@
               <h2 class="text-lg font-semibold text-gray-900">Feed Subscriptions</h2>
               <p class="text-sm text-gray-600 mt-1">Content sources for each position</p>
             </div>
-            <%= link_to "Manage All", screen_subscriptions_url(@screen), class: "text-sm text-blue-600 hover:text-blue-800 font-medium" %>
+            <%= link_to "Manage All", screen_subscriptions_url(@screen), class: "inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
           </div>
         </div>
         <div class="p-4 space-y-4">
@@ -72,8 +77,8 @@
                   <% end %>
                 </div>
               <% else %>
-                <div class="text-center py-3">
-                  <svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="text-center">
+                  <svg class="w-8 h-8 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                   </svg>
                   <p class="text-xs text-gray-500">No feeds subscribed</p>
