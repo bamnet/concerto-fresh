@@ -19,9 +19,11 @@
     <%= button_to [@screen, subscription],
         method: :delete,
         class: "text-neutral-400 hover:text-red-600 p-1 rounded transition-colors",
-        data: {
-          confirm: "Remove this subscription?",
-          turbo_method: :delete
+        form: {
+          data: {
+            turbo_confirm: "Remove this subscription?"
+          },
+          class: "inline-block"
         },
         title: "Remove subscription" do %>
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

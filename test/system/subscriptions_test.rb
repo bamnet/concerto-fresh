@@ -27,7 +27,9 @@ class SubscriptionsTest < ApplicationSystemTestCase
 
     subscription = subscriptions(:one_sidebar_rss)
     within("#" + dom_id(subscription)) do
-      click_on "Remove"
+      accept_confirm do
+        click_on "Remove"
+      end
     end
 
     assert_text "#{subscription.field.name} field subscription to #{subscription.feed.name} feed was successfully destroyed"

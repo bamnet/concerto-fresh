@@ -23,21 +23,20 @@
 
   <% active_subscriptions = [] %>
   <% @screen.template.positions.each do |position| %>
+    <% field_subscriptions = @screen.subscriptions.where(field: position.field) %>
     <div id="<%= dom_id position %>" class="bg-white rounded-lg border border-neutral-200 shadow-sm">
       <!-- Field Header -->
       <div class="px-4 py-3 border-b border-neutral-200">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-semibold text-neutral-900"><%= position.field.name %> Field</h2>
           <div class="text-xs text-neutral-500">
-            <%= pluralize(@screen.subscriptions.where(field: position.field).count, 'feed') %>
+            <%= pluralize(field_subscriptions.size, 'feed') %>
           </div>
         </div>
       </div>
 
       <!-- Content Area -->
       <div class="px-4 py-3">
-        <% field_subscriptions = @screen.subscriptions.where(field: position.field) %>
-        
         <!-- Current Subscriptions (Compact) -->
         <% if field_subscriptions.any? %>
           <div class="space-y-2 mb-4">
@@ -75,7 +74,7 @@
       </div>
       
       <div class="px-4 py-3">
-        <% inactive_subscriptions.group_by{|s| s.field_id }.each do |field_id, subscriptions| %>
+        <% inactive_subscriptions.group_by(&:field_id).each do |field_id, subscriptions| %>
           <div class="mb-3 last:mb-0">
             <h4 class="text-sm font-medium text-neutral-700 mb-2">
               <%= subscriptions.first.field.name %> Field

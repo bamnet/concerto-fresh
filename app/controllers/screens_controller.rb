@@ -9,12 +9,13 @@ class ScreensController < ApplicationController
 
   # GET /screens/1 or /screens/1.json
   def show
+    @subscriptions_by_field = @screen.subscriptions.includes(:feed).group_by(&:field_id)
   end
 
   # GET /screens/new
   def new
     @screen = Screen.new
-    @templates = Template.all
+    @templates = Template.all.with_attached_image
   end
 
   # GET /screens/1/edit
