@@ -15,7 +15,6 @@ class ScreensController < ApplicationController
   # GET /screens/new
   def new
     @screen = Screen.new
-    @templates = Template.all.with_attached_image
   end
 
   # GET /screens/1/edit
@@ -67,10 +66,7 @@ class ScreensController < ApplicationController
     end
 
     def set_templates
-      # Since 'Template' conflicts with ActionView::Template,
-      # we can't call `Template.all` in a view without errors.
-      # (this is a hack)
-      @templates = Template.all
+      @templates = Template.all.with_attached_image
     end
 
     # Only allow a list of trusted parameters through.
