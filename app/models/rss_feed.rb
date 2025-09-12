@@ -21,6 +21,10 @@ class RssFeed < Feed
       { headlines: "headlines", details: "details", ticker: "ticker" }
     end
 
+    def render_mode
+      (ticker? ? RichText.render_as[:plaintext] : RichText.render_as[:html])
+    end
+
     def refresh
       new_items = new_items()
       existing_content = content.all
@@ -30,6 +34,7 @@ class RssFeed < Feed
       existing_content.each.with_index do |content, index|
         # First, update all the existing content.
         if new_items.length > index
+          content.render_as = render_mode,
           content.text = new_items[index]
           content.name = "#{name} (#{index + 1})"
           content.start_time = nil
@@ -48,7 +53,7 @@ class RssFeed < Feed
       if offset > 0
         new_items[existing_content.length..].each.with_index do |item, index|
           content << RichText.new(
-            render_as: (ticker? ? RichText.render_as[:plaintext] : RichText.render_as[:html]),
+            render_as: render_mode,
             name: "#{name} (#{index + 1})",
             text: item,
             user: User.find_by(is_system_user: true),
