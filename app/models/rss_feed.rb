@@ -80,7 +80,7 @@ class RssFeed < Feed
           end
         elsif ticker?
           items.each do |item|
-            contents << item[:title].gsub(/<\/?[^>]*>/, "").gsub(/\R/, " ").strip
+            contents << CGI.unescapeHTML(ActionController::Base.helpers.strip_tags(item[:title]))
           end
         else # headlines
           items.each_slice(5).with_index do |slice, index|
