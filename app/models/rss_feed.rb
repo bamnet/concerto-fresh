@@ -85,7 +85,7 @@ class RssFeed < Feed
           end
         elsif ticker?
           items.each do |item|
-            contents << CGI.unescapeHTML(ActionController::Base.helpers.strip_tags(item[:title]))
+            contents << CGI.unescapeHTML(ActionController::Base.helpers.strip_tags(item[:title])).squish
           end
         else # headlines
           items.each_slice(5).with_index do |slice, index|
