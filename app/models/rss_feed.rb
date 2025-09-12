@@ -16,8 +16,9 @@ class RssFeed < Feed
 
     def headlines? = formatter == "headlines"
     def details? = formatter == "details"
+    def ticker? = formatter == "ticker"
     def self.formatters
-      { headlines: "headlines", details: "details" }
+      { headlines: "headlines", details: "details", ticker: "ticker" }
     end
 
     def refresh
@@ -47,7 +48,7 @@ class RssFeed < Feed
       if offset > 0
         new_items[existing_content.length..].each.with_index do |item, index|
           content << RichText.new(
-            render_as: "html",
+            render_as: (ticker? ? RichText.render_as[:plaintext] : RichText.render_as[:html]),
             name: "#{name} (#{index + 1})",
             text: item,
             user: User.find_by(is_system_user: true),
@@ -76,6 +77,10 @@ class RssFeed < Feed
           items.each do |item|
             description = ActionController::Base.helpers.sanitize(item[:description])
             contents << "<h1>#{CGI.escapeHTML(item[:title])}</h1><p>#{description}</p>"
+          end
+        elsif ticker?
+          items.each do |item|
+            contents << item[:title].gsub(/<\/?[^>]*>/, "").gsub(/\R/, " ").strip
           end
         else # headlines
           items.each_slice(5).with_index do |slice, index|
