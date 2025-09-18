@@ -95,9 +95,9 @@
                     </span>
                   <% else %>
                     <%= form_with model: [@group, membership], method: :patch, local: true, class: "inline-block" do |form| %>
-                      <%= form.select :role, 
-                          options_for_select([['Member', 'member'], ['Admin', 'admin']], membership.role), 
-                          {}, 
+                      <%= form.select :role,
+                          options_for_select(Membership.roles.map { |key, value| [key.humanize, key] }, membership.role),
+                          {},
                           { class: "frm-input py-1 text-sm", onchange: "this.form.submit();" } %>
                     <% end %>
                   <% end %>
@@ -153,7 +153,7 @@
       <div class="w-32">
         <label class="frm-label mb-2 block">Role</label>
         <%= form.select :role,
-            options_for_select([['Member', 'member'], ['Admin', 'admin']], 'member'),
+            options_for_select(Membership.roles.map { |key, value| [key.humanize, key] }, 'member'),
             {},
             { class: "frm-input" } %>
       </div>
