@@ -4,13 +4,10 @@ class MembershipsController < ApplicationController
   before_action :set_membership, only: [ :update, :destroy ]
 
   def create
-    user = User.find(params[:user_id])
-    role = params[:role] || "member"
-
-    @membership = @group.memberships.build(user: user, role: role)
+    @membership = @group.memberships.build(membership_params)
 
     if @membership.save
-      redirect_to @group, notice: "#{user.full_name} has been added to the group."
+      redirect_to @group, notice: "#{@membership.user.full_name} has been added to the group."
     else
       redirect_to @group, alert: @membership.errors.full_messages.join(", ")
     end
@@ -45,6 +42,6 @@ class MembershipsController < ApplicationController
   end
 
   def membership_params
-    params.require(:membership).permit(:role)
+    params.require(:membership).permit(:user_id, :role)
   end
 end

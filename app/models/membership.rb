@@ -15,9 +15,12 @@ class Membership < ApplicationRecord
   private
 
   def cannot_remove_from_system_group
-    if group&.name == "All Registered Users"
-      errors.add(:base, 'Cannot remove users from the "All Registered Users" group')
-      throw(:abort)
-    end
+    # Prevent manual removal from the system group, but allow deletion when this
+    # record is being destroyed due to a dependent destroy (e.g., user/group destroy).
+    return unless group&.name == "All Registered Users"
+    return if destroyed_by_association.present?
+
+    errors.add(:base, 'Cannot remove users from the "All Registered Users" group')
+    throw(:abort)
   end
 end
