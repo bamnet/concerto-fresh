@@ -2,29 +2,6 @@
   "ignored_warnings": [
     {
       "warning_type": "Mass Assignment",
-      "warning_code": 105,
-      "fingerprint": "5011c2eef8a2a8400a7700cb5127ec34d988b403470b71484c7ea37f000d0669",
-      "check_name": "PermitAttributes",
-      "message": "Potentially dangerous key allowed for mass assignment",
-      "file": "app/controllers/memberships_controller.rb",
-      "line": 48,
-      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
-      "code": "params.require(:membership).permit(:role)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "MembershipsController",
-        "method": "membership_params"
-      },
-      "user_input": ":role",
-      "confidence": "Medium",
-      "cwe_id": [
-        915
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "7c3eb87fe7aedf75037641c6a10bb6b8d8535341c16b7cebf842a5a9b711a2ee",
       "check_name": "MassAssignment",
@@ -45,6 +22,29 @@
         915
       ],
       "note": "The Admin UI is designed to allow all settings to be set."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "ae47aedb3236d675060a73edc6746020a29e5daf81b8d6cc745fa997014eaef4",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/memberships_controller.rb",
+      "line": 45,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:membership).permit(:user_id, :role)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "MembershipsController",
+        "method": "membership_params"
+      },
+      "user_input": ":role",
+      "confidence": "Medium",
+      "cwe_id": [
+        915
+      ],
+      "note": ""
     }
   ],
   "brakeman_version": "7.1.0"
