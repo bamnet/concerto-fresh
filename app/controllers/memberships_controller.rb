@@ -42,6 +42,9 @@ class MembershipsController < ApplicationController
   end
 
   def membership_params
-    params.require(:membership).permit(:user_id, :role)
+    attrs = [ :role ]
+    # Only allow user_id on new memberships.
+    attrs << :user_id if action_name == "create"
+    params.require(:membership).permit(*attrs)
   end
 end
