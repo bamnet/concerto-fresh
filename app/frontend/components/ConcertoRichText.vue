@@ -1,8 +1,22 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
+
+/**
+ * @typedef {object} RichTextContent
+ * @property {string} render_as - The format of the text, either 'plaintext' or 'html'.
+ * @property {string} text - The actual text content to be rendered. May be plain text or HTML.
+ */
+
 const props = defineProps({
-  content: {type: Object, required: true}
+  /** @type {RichTextContent} */
+  content: {
+    type: Object,
+    required: true,
+    validator: (value) => {
+      return ['plaintext', 'html'].includes(value.render_as) && typeof value.text === 'string';
+    },
+  },
 });
 
 // A container stretched to fill the entire field.
@@ -17,6 +31,12 @@ async function resizeText() {
   let displayHeight = contentElement.scrollHeight;
   let fieldHeight = containerElement.offsetHeight;
   let fontScale = 100;
+
+  if (displayHeight === 0 || fieldHeight === 0) {
+    // Nothing to do.
+    console.error('Cannot resize text: zero height detected.');
+    return;
+  }
 
   console.debug(`Field height: ${fieldHeight}, Display height: ${displayHeight}`);
 
