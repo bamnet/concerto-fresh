@@ -9,12 +9,12 @@ class Group < ApplicationRecord
 
   # Finds all users in this group who are admins.
   def admins
-    users.joins(:memberships).where(memberships: { role: :admin, group_id: self.id })
+    users.merge(Membership.admin)
   end
 
   # Finds all users in this group who are regular members.
   def members
-    users.joins(:memberships).where(memberships: { role: :member, group_id: self.id })
+    users.merge(Membership.member)
   end
 
   # Class method to easily find the special group
