@@ -3,6 +3,11 @@ require "test_helper"
 class ScreensControllerTest < ActionDispatch::IntegrationTest
   setup do
     @screen = screens(:one)
+    sign_in users(:admin)
+  end
+
+  teardown do
+    sign_out :user
   end
 
   test "should get index" do

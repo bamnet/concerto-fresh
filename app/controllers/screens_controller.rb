@@ -19,11 +19,14 @@ class ScreensController < ApplicationController
 
   # GET /screens/1/edit
   def edit
+    authorize @screen
   end
 
   # POST /screens or /screens.json
   def create
     @screen = Screen.new(screen_params)
+
+    authorize @screen
 
     respond_to do |format|
       if @screen.save
@@ -38,6 +41,8 @@ class ScreensController < ApplicationController
 
   # PATCH/PUT /screens/1 or /screens/1.json
   def update
+    authorize @screen
+
     respond_to do |format|
       if @screen.update(screen_params)
         format.html { redirect_to screen_url(@screen), notice: "Screen was successfully updated." }
@@ -51,6 +56,8 @@ class ScreensController < ApplicationController
 
   # DELETE /screens/1 or /screens/1.json
   def destroy
+    authorize @screen
+
     @screen.destroy!
 
     respond_to do |format|
@@ -73,6 +80,6 @@ class ScreensController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def screen_params
-      params.require(:screen).permit(:name, :template_id, :group_id)
+      params.require(:screen).permit(policy(@screen || Screen.new()).permitted_attributes)
     end
 end
