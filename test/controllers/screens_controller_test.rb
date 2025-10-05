@@ -50,4 +50,11 @@ class ScreensControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to screens_url
   end
+
+  test "should not get edit if not authorized" do
+    sign_in users(:non_member)
+    get edit_screen_url(@screen), headers: { "Referer" => screen_url(@screen) }
+    assert_redirected_to screen_url(@screen)
+    assert_equal "You are not authorized to perform this action.", flash[:alert]
+  end
 end
