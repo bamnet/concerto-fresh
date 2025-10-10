@@ -26,8 +26,8 @@ class ScreenPolicyTest < ActiveSupport::TestCase
     refute ScreenPolicy.new(@non_group_user, @screen).destroy?
   end
 
-  test "update allows group_id change when user is admin of new group" do
-    # Admin user trying to change screen to a group they admin
+  test "update allows group_id change when user is admin of both old and new groups" do
+    # Admin user trying to change screen to a group they also admin
     @screen.group_id = groups(:content_creators).id
     policy = ScreenPolicy.new(@group_admin_user, @screen)
     assert policy.update?
@@ -37,6 +37,20 @@ class ScreenPolicyTest < ActiveSupport::TestCase
     # Regular user trying to change screen to a group they don't admin
     @screen.group_id = groups(:moderators).id
     policy = ScreenPolicy.new(@group_regular_user, @screen)
+    refute policy.update?
+  end
+
+  test "update denies group_id change when user is not admin of old group" do
+    # Regular user (member but not admin of old group) trying to change screen
+    @screen.group_id = groups(:content_creators).id
+    policy = ScreenPolicy.new(@group_regular_user, @screen)
+    refute policy.update?
+  end
+
+  test "update denies group_id change when user is not admin of both groups" do
+    # Admin user trying to change screen to screen_two_owners (where they're not admin)
+    @screen.group_id = groups(:screen_two_owners).id
+    policy = ScreenPolicy.new(@group_admin_user, @screen)
     refute policy.update?
   end
 

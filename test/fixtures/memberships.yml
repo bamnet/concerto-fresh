@@ -34,3 +34,8 @@ regular_screen_one_owners:
   user: regular
   group: screen_one_owners
   role: member
+
+admin_screen_two_owners:
+  user: admin
+  group: screen_two_owners
+  role: member

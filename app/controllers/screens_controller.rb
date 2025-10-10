@@ -41,10 +41,12 @@ class ScreensController < ApplicationController
 
   # PATCH/PUT /screens/1 or /screens/1.json
   def update
+    @screen.assign_attributes(screen_params)
+
     authorize @screen
 
     respond_to do |format|
-      if @screen.update(screen_params)
+      if @screen.save
         format.html { redirect_to screen_url(@screen), notice: "Screen was successfully updated." }
         format.json { render :show, status: :ok, location: @screen }
       else

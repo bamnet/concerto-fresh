@@ -25,8 +25,14 @@ class ScreenPolicy < ApplicationPolicy
   def update?
     return false unless edit?
 
-    # If group_id is being changed, ensure user is admin of the new group
+    # If group_id is being changed, ensure user is admin of both
+    # the current group and the new group.
     if record.group_id_changed? && record.group_id_was != record.group_id
+      # First check the old (aka current) group.
+      old_group = Group.find_by(id: record.group_id_was)
+      return false unless old_group.is_admin?(user)
+
+      # Then check the new / proposed group.
       new_group = Group.find_by(id: record.group_id)
       return false unless new_group.is_admin?(user)
     end

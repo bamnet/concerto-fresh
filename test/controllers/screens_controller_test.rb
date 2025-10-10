@@ -57,4 +57,41 @@ class ScreensControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to screen_url(@screen)
     assert_equal "You are not authorized to perform this action.", flash[:alert]
   end
+
+  test "should not update screen when changing group without proper admin permissions" do
+    sign_in users(:regular)
+
+    # Use a group where regular user has no membership at all
+    new_group = groups(:screen_two_owners)
+    original_group = @screen.group
+
+    # The group_id should be filtered out by permitted_attributes, so the update should succeed
+    # but the group should not change
+    patch screen_url(@screen), params: { screen: { name: "Updated Name", template_id: @screen.template_id, group_id: new_group.id } }
+    assert_redirected_to screen_url(@screen)
+
+    @screen.reload
+    assert_equal "Updated Name", @screen.name
+    assert_equal original_group.id, @screen.group_id  # Group should not have changed
+  end
+
+  test "should update screen when changing group with proper admin permissions" do
+    sign_in users(:admin)
+    patch screen_url(@screen), params: { screen: { name: @screen.name, template_id: @screen.template_id, group_id: groups(:content_creators).id } }
+    assert_redirected_to screen_url(@screen)
+    @screen.reload
+    assert_equal groups(:content_creators).id, @screen.group_id
+  end
+
+  test "should not allow group_id in permitted_attributes for non-admin users" do
+    sign_in users(:regular)
+    policy = ScreenPolicy.new(users(:regular), @screen)
+    refute_includes policy.permitted_attributes, :group_id
+  end
+
+  test "should allow group_id in permitted_attributes for admin users" do
+    sign_in users(:admin)
+    policy = ScreenPolicy.new(users(:admin), @screen)
+    assert_includes policy.permitted_attributes, :group_id
+  end
 end
