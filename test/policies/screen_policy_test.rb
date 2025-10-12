@@ -8,21 +8,64 @@ class ScreenPolicyTest < ActiveSupport::TestCase
     @screen = screens(:one)
   end
 
-  test "group admin has full control of screen" do
+  test "index? is permitted for all users" do
+    assert ScreenPolicy.new(nil, @screen).index?
+    assert ScreenPolicy.new(@non_group_user, @screen).index?
+  end
+
+  test "show? is permitted for all users" do
+    assert ScreenPolicy.new(nil, @screen).show?
+    assert ScreenPolicy.new(@non_group_user, @screen).show?
+  end
+
+  test "new? is permitted for user who is an admin of any group" do
+    assert ScreenPolicy.new(@group_admin_user, Screen.new).new?
+  end
+
+  test "new? is denied for user who is not an admin of any group" do
+    refute ScreenPolicy.new(@group_regular_user, Screen.new).new?
+  end
+
+  test "scope resolves to all screens" do
+    resolved_scope = ScreenPolicy::Scope.new(nil, Screen.all).resolve
+    assert_equal Screen.all.to_a, resolved_scope.to_a
+  end
+
+  # --- Create, Edit, Destroy Tests --- #
+
+  test "create? is permitted for a group admin" do
     assert ScreenPolicy.new(@group_admin_user, @screen).create?
+  end
+
+  test "create? is denied for a regular group member" do
+    refute ScreenPolicy.new(@group_regular_user, @screen).create?
+  end
+
+  test "create? is denied for a non-group member" do
+    refute ScreenPolicy.new(@non_group_user, @screen).create?
+  end
+
+  test "edit? is permitted for a group admin" do
     assert ScreenPolicy.new(@group_admin_user, @screen).edit?
+  end
+
+  test "edit? is permitted for a regular group member" do
+    assert ScreenPolicy.new(@group_regular_user, @screen).edit?
+  end
+
+  test "edit? is denied for a non-group member" do
+    refute ScreenPolicy.new(@non_group_user, @screen).edit?
+  end
+
+  test "destroy? is permitted for a group admin" do
     assert ScreenPolicy.new(@group_admin_user, @screen).destroy?
   end
 
-  test "regular group member can only edit screen" do
-    refute ScreenPolicy.new(@group_regular_user, @screen).create?
-    assert ScreenPolicy.new(@group_regular_user, @screen).edit?
+  test "destroy? is denied for a regular group member" do
     refute ScreenPolicy.new(@group_regular_user, @screen).destroy?
   end
 
-  test "non-group member has no permissions on screen" do
-    refute ScreenPolicy.new(@non_group_user, @screen).create?
-    refute ScreenPolicy.new(@non_group_user, @screen).edit?
+  test "destroy? is denied for a non-group member" do
     refute ScreenPolicy.new(@non_group_user, @screen).destroy?
   end
 

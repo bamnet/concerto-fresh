@@ -6,10 +6,24 @@ class ScreenPolicy < ApplicationPolicy
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
 
   class Scope < ApplicationPolicy::Scope
-    # NOTE: Be explicit about which records you allow access to!
-    # def resolve
-    #   scope.all
-    # end
+    # Screens are visible to all users, even non-logged-in users.
+    def resolve
+      scope.all
+    end
+  end
+
+  def index?
+    true
+  end
+
+  def show?
+    true
+  end
+
+  def new?
+    # Screens can be created by any admin of any group.
+    return false unless user
+    user&.memberships&.admin&.any?
   end
 
   def create?
@@ -29,14 +43,16 @@ class ScreenPolicy < ApplicationPolicy
 
     # If group_id is being changed, ensure user is admin of both
     # the current group and the new group.
-    if record.group_id_changed? && record.group_id_was != record.group_id
-      # First check the old (aka current) group.
-      old_group = Group.find_by(id: record.group_id_was)
-      return false unless old_group.is_admin?(user)
+    if record.group_id_changed?
+      # Check permissions on the old group, if it existed.
+      if record.group_id_was.present?
+        old_group = Group.find(record.group_id_was)
+        return false unless old_group.is_admin?(user)
+      end
 
-      # Then check the new / proposed group.
-      new_group = Group.find_by(id: record.group_id)
-      return false unless new_group.is_admin?(user)
+      # Check permissions on the new group.
+      # The `record` is already associated with the new group object.
+      return false unless record.group&.is_admin?(user)
     end
 
     true

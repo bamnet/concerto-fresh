@@ -2,20 +2,23 @@ class ScreensController < ApplicationController
   before_action :authenticate_user!, except: [ :index, :show ]
   before_action :set_form_options, only: %i[ new edit ]
   before_action :set_screen, only: %i[ show edit update destroy ]
+  after_action :verify_pundit_authorization
 
   # GET /screens or /screens.json
   def index
-    @screens = Screen.all
+    @screens = policy_scope(Screen)
   end
 
   # GET /screens/1 or /screens/1.json
   def show
+    authorize @screen
     @subscriptions_by_field = @screen.subscriptions.includes(:feed).group_by(&:field_id)
   end
 
   # GET /screens/new
   def new
     @screen = Screen.new
+    authorize @screen
   end
 
   # GET /screens/1/edit
@@ -78,11 +81,27 @@ class ScreensController < ApplicationController
     # Sets options for form selects.
     def set_form_options
       @templates = Template.all.with_attached_image
-      @groups = Group.all
+      # In an edit context, ensure the screen's current group is in the list for display,
+      # even if the user is not an admin of it. They won't be able to *switch* to it,
+      # but they should be able to see it.
+      @groups = if @screen&.persisted?
+        (current_user.admin_groups + [ @screen.group ]).compact.uniq
+      else
+        current_user.admin_groups
+      end
     end
 
     # Only allow a list of trusted parameters through.
     def screen_params
       params.require(:screen).permit(policy(@screen || Screen.new()).permitted_attributes)
+    end
+
+    # Ensure that Pundit authorization has been performed for every action.
+    def verify_pundit_authorization
+      if action_name == "index"
+        verify_policy_scoped
+      else
+        verify_authorized
+      end
     end
 end

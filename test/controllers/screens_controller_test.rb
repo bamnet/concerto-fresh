@@ -152,4 +152,52 @@ class ScreensControllerTest < ActionDispatch::IntegrationTest
     assert_select "*", text: "Edit Screen", count: 0
     assert_select "*", text: "Delete Screen", count: 0
   end
+
+  test "admin should see new screen button on index page" do
+    sign_in users(:admin)
+    get screens_url
+    assert_response :success
+
+    # Check that new screen button is present
+    assert_select "*", text: "New Screen"
+  end
+
+  test "regular group member should see new screen button on index page if they are admin of any group" do
+    # Make regular user an admin of content_creators group (they're already a member)
+    memberships(:regular_content_creator).update!(role: "admin")
+
+    sign_in users(:regular)
+    get screens_url
+    assert_response :success
+
+    # Check that new screen button is present
+    assert_select "*", text: "New Screen"
+  end
+
+  test "regular group member should not see new screen button if they are not admin of any group" do
+    sign_in users(:regular)
+    get screens_url
+    assert_response :success
+
+    # Check that new screen button is NOT present (regular is only a member, not admin)
+    assert_select "*", text: "New Screen", count: 0
+  end
+
+  test "non-member should not see new screen button on index page" do
+    sign_in users(:non_member)
+    get screens_url
+    assert_response :success
+
+    # Check that new screen button is NOT present
+    assert_select "*", text: "New Screen", count: 0
+  end
+
+  test "signed out user should not see new screen button on index page" do
+    sign_out :user
+    get screens_url
+    assert_response :success
+
+    # Check that new screen button is NOT present
+    assert_select "*", text: "New Screen", count: 0
+  end
 end
