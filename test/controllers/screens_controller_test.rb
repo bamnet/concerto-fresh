@@ -109,4 +109,47 @@ class ScreensControllerTest < ActionDispatch::IntegrationTest
     # Check that the help text indicates no permission to change group
     assert_select "p", text: /You don't have permission to change the group for this screen/
   end
+
+  test "admin should see edit and delete buttons on screen show page" do
+    sign_in users(:admin)
+    get screen_url(@screen)
+    assert_response :success
+
+    # Check that edit and delete buttons are present
+    assert_select "*", text: "Edit Screen"
+    assert_select "*", text: "Delete Screen"
+  end
+
+  test "regular group member should see edit button but not delete button on screen show page" do
+    sign_in users(:regular)
+    get screen_url(@screen)
+    assert_response :success
+
+    # Check that edit button is present (regular members can edit)
+    assert_select "*", text: "Edit Screen"
+
+    # Check that delete button is NOT present (only admins can delete)
+    assert_select "*", text: "Delete Screen", count: 0
+  end
+
+  test "non-member should not see edit or delete buttons on screen show page" do
+    sign_in users(:non_member)
+    get screen_url(@screen)
+    assert_response :success
+
+    # Check that edit and delete buttons are NOT present
+    assert_select "*", text: "Edit Screen", count: 0
+    assert_select "*", text: "Delete Screen", count: 0
+  end
+
+  test "signed out user should not see edit or delete buttons on screen show page" do
+    # Explicitly sign out any user that might be signed in from setup
+    sign_out :user
+    get screen_url(@screen)
+    assert_response :success
+
+    # Check that edit and delete buttons are NOT present
+    assert_select "*", text: "Edit Screen", count: 0
+    assert_select "*", text: "Delete Screen", count: 0
+  end
 end

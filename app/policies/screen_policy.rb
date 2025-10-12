@@ -14,11 +14,13 @@ class ScreenPolicy < ApplicationPolicy
 
   def create?
     # Screens can be created by any admin of the associated group.
+    return false unless user
     record.group.is_admin?(user)
   end
 
   def edit?
     # Screens can be edited by any member of the associated group.
+    return false unless user
     record.group.is_member?(user)
   end
 
@@ -42,6 +44,7 @@ class ScreenPolicy < ApplicationPolicy
 
   def destroy?
     # Screens can be deleted by any admin of the associated group.
+    return false unless user
     record.group.is_admin?(user)
   end
 
@@ -57,6 +60,7 @@ class ScreenPolicy < ApplicationPolicy
   #
   # This is used both in the policy and in the view to disable UI elements.
   def can_edit_group?
+    return false unless user
     record.new_record? || record.group.is_admin?(user)
   end
 end
