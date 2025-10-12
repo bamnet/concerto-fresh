@@ -1,4 +1,5 @@
 class ScreensController < ApplicationController
+  before_action :authenticate_user!, except: [ :index, :show ]
   before_action :set_form_options, only: %i[ new edit ]
   before_action :set_screen, only: %i[ show edit update destroy ]
 

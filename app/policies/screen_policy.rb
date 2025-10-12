@@ -46,10 +46,17 @@ class ScreenPolicy < ApplicationPolicy
   end
 
   def permitted_attributes
-    if record.new_record? || record.group.is_admin?(user)
+    if can_edit_group?
       [ :name, :template_id, :group_id ]
     else
       [ :name, :template_id ]
     end
+  end
+
+  # Helper method to determine if the user can edit the group which owns a screen.
+  #
+  # This is used both in the policy and in the view to disable UI elements.
+  def can_edit_group?
+    record.new_record? || record.group.is_admin?(user)
   end
 end

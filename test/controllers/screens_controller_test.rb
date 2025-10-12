@@ -94,4 +94,19 @@ class ScreensControllerTest < ActionDispatch::IntegrationTest
     policy = ScreenPolicy.new(users(:admin), @screen)
     assert_includes policy.permitted_attributes, :group_id
   end
+
+  test "regular group member should see disabled group selector when editing screen" do
+    sign_in users(:regular)
+    get edit_screen_url(@screen)
+    assert_response :success
+
+    # Check that the group selector is present but disabled
+    assert_select "select[name='screen[group_id]'][disabled='disabled']"
+
+    # Check that there's a hidden field with the current group_id
+    assert_select "input[type='hidden'][name='screen[group_id]'][value='#{@screen.group_id}']"
+
+    # Check that the help text indicates no permission to change group
+    assert_select "p", text: /You don't have permission to change the group for this screen/
+  end
 end
