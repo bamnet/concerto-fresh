@@ -22,11 +22,13 @@ class Group < ApplicationRecord
 
   # Check if a user is a member of the group.
   def member?(user)
+    return false unless user
     users.exists?(user.id)
   end
 
   # Check if a user is an admin of the group.
   def admin?(user)
+    return false unless user
     admins.exists?(user.id)
   end
 

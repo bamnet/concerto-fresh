@@ -23,7 +23,7 @@ class ScreenPolicy < ApplicationPolicy
   def new?
     # Screens can be created by any admin of any group.
     return false unless user
-    user&.admin_groups&.any?
+    user.admin_groups.any?
   end
 
   def create?
@@ -46,8 +46,8 @@ class ScreenPolicy < ApplicationPolicy
     if record.group_id_changed?
       # Check permissions on the old group, if it existed.
       if record.group_id_was.present?
-        old_group = Group.find(record.group_id_was)
-        return false unless old_group.admin?(user)
+        old_group = Group.find_by(id: record.group_id_was)
+        return false unless old_group&.admin?(user)
       end
 
       # Check permissions on the new group.
