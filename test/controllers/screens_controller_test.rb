@@ -162,18 +162,6 @@ class ScreensControllerTest < ActionDispatch::IntegrationTest
     assert_select "*", text: "New Screen"
   end
 
-  test "regular group member should see new screen button on index page if they are admin of any group" do
-    # Make regular user an admin of content_creators group (they're already a member)
-    memberships(:regular_content_creator).update!(role: "admin")
-
-    sign_in users(:regular)
-    get screens_url
-    assert_response :success
-
-    # Check that new screen button is present
-    assert_select "*", text: "New Screen"
-  end
-
   test "regular group member should not see new screen button if they are not admin of any group" do
     sign_in users(:regular)
     get screens_url

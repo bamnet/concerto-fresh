@@ -23,19 +23,19 @@ class ScreenPolicy < ApplicationPolicy
   def new?
     # Screens can be created by any admin of any group.
     return false unless user
-    user&.memberships&.admin&.any?
+    user&.admin_groups&.any?
   end
 
   def create?
     # Screens can be created by any admin of the associated group.
     return false unless user
-    record.group.is_admin?(user)
+    record.group.admin?(user)
   end
 
   def edit?
     # Screens can be edited by any member of the associated group.
     return false unless user
-    record.group.is_member?(user)
+    record.group.member?(user)
   end
 
   def update?
@@ -47,12 +47,12 @@ class ScreenPolicy < ApplicationPolicy
       # Check permissions on the old group, if it existed.
       if record.group_id_was.present?
         old_group = Group.find(record.group_id_was)
-        return false unless old_group.is_admin?(user)
+        return false unless old_group.admin?(user)
       end
 
       # Check permissions on the new group.
       # The `record` is already associated with the new group object.
-      return false unless record.group&.is_admin?(user)
+      return false unless record.group&.admin?(user)
     end
 
     true
@@ -61,7 +61,7 @@ class ScreenPolicy < ApplicationPolicy
   def destroy?
     # Screens can be deleted by any admin of the associated group.
     return false unless user
-    record.group.is_admin?(user)
+    record.group.admin?(user)
   end
 
   def permitted_attributes
@@ -77,6 +77,6 @@ class ScreenPolicy < ApplicationPolicy
   # This is used both in the policy and in the view to disable UI elements.
   def can_edit_group?
     return false unless user
-    record.new_record? || record.group.is_admin?(user)
+    record.new_record? || record.group.admin?(user)
   end
 end

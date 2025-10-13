@@ -21,12 +21,12 @@ class Group < ApplicationRecord
   end
 
   # Check if a user is a member of the group.
-  def is_member?(user)
+  def member?(user)
     users.exists?(user.id)
   end
 
   # Check if a user is an admin of the group.
-  def is_admin?(user)
+  def admin?(user)
     admins.exists?(user.id)
   end
 

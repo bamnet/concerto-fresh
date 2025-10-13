@@ -1,8 +1,12 @@
 class ScreensController < ApplicationController
   before_action :authenticate_user!, except: [ :index, :show ]
-  before_action :set_form_options, only: %i[ new edit ]
   before_action :set_screen, only: %i[ show edit update destroy ]
-  after_action :verify_pundit_authorization
+  before_action :set_form_options, only: %i[ new edit ]
+
+
+  # Ensure that Pundit authorization has been performed for every action.
+  after_action :verify_authorized, except: :index
+  after_action :verify_policy_scoped, only: :index
 
   # GET /screens or /screens.json
   def index
@@ -94,14 +98,5 @@ class ScreensController < ApplicationController
     # Only allow a list of trusted parameters through.
     def screen_params
       params.require(:screen).permit(policy(@screen || Screen.new()).permitted_attributes)
-    end
-
-    # Ensure that Pundit authorization has been performed for every action.
-    def verify_pundit_authorization
-      if action_name == "index"
-        verify_policy_scoped
-      else
-        verify_authorized
-      end
     end
 end
