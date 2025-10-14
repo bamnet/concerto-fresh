@@ -17,13 +17,11 @@ class SubscriptionsController < ApplicationController
       subscribed_feeds = @screen.subscriptions.where(field_id: field_ids).pluck(:field_id, :feed_id)
       subscribed_by_field = subscribed_feeds.group_by(&:first).transform_values { |pairs| pairs.map(&:second) }
 
+      all_feeds = Feed.all.to_a
+
       field_ids.each do |field_id|
         subscribed_feed_ids = subscribed_by_field[field_id] || []
-        @available_feeds_by_field[field_id] = if subscribed_feed_ids.any?
-          Feed.where.not(id: subscribed_feed_ids)
-        else
-          Feed.all
-        end
+        @available_feeds_by_field[field_id] = all_feeds.reject { |feed| subscribed_feed_ids.include?(feed.id) }
       end
     end
 
