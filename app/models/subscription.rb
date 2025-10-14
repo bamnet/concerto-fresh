@@ -12,14 +12,4 @@ class Subscription < ApplicationRecord
 
   # Scope to find subscriptions for a specific screen and field
   scope :for_screen_and_field, ->(screen_id, field_id) { where(screen_id: screen_id, field_id: field_id) }
-
-  # Class method to get available feeds for a field on a screen
-  def self.available_feeds_for_field(screen_id, field_id)
-    subscribed_feed_ids = for_screen_and_field(screen_id, field_id).pluck(:feed_id)
-    if subscribed_feed_ids.any?
-      Feed.where.not(id: subscribed_feed_ids)
-    else
-      Feed.all
-    end
-  end
 end
