@@ -92,6 +92,9 @@ GEM
     brakeman (7.1.0)
       racc
     builder (3.3.0)
+    bundler-audit (0.9.2)
+      bundler (>= 1.2.0, < 3)
+      thor (~> 1.0)
     capybara (3.40.0)
       addressable
       matrix
@@ -454,10 +457,11 @@ PLATFORMS
 DEPENDENCIES
   bootsnap
   brakeman
+  bundler-audit
   capybara
   debug
   devise (~> 4.9)
-  image_processing (~> 1.14)
+  image_processing (~> 1.2)
   importmap-rails
   jbuilder
   kamal
@@ -474,7 +478,7 @@ DEPENDENCIES
   solid_queue
   sqlite3 (>= 2.1)
   stimulus-rails
-  tailwindcss-rails (~> 4.3)
+  tailwindcss-rails
   thruster
   turbo-rails
   tzinfo-data
