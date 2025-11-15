@@ -28,12 +28,12 @@ class GroupTest < ActiveSupport::TestCase
   end
 
   test "should find system admins group" do
-    system_admins = Group.find_or_create_by!(name: "System Administrators")
+    system_admins = Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
     assert_equal system_admins, Group.system_admins_group
   end
 
   test "should identify system administrators group" do
-    system_admins = Group.find_or_create_by!(name: "System Administrators")
+    system_admins = Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
     regular_group = groups(:content_creators)
 
     assert system_admins.system_admin_group?
@@ -41,7 +41,7 @@ class GroupTest < ActiveSupport::TestCase
   end
 
   test "should include system administrators in system groups" do
-    system_admins = Group.find_or_create_by!(name: "System Administrators")
+    system_admins = Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
     all_users = groups(:all_users)
     regular_group = groups(:content_creators)
 
@@ -58,7 +58,7 @@ class GroupTest < ActiveSupport::TestCase
   end
 
   test "should not destroy system administrators group" do
-    system_admins = Group.find_or_create_by!(name: "System Administrators")
+    system_admins = Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
     assert_not system_admins.destroy
   end
 
@@ -76,5 +76,67 @@ class GroupTest < ActiveSupport::TestCase
     group = groups(:content_creators)
     assert_respond_to group, :users
     assert_includes group.users, users(:admin)
+  end
+
+  test "should not rename All Registered Users group" do
+    all_users = groups(:all_users)
+    original_name = all_users.name
+
+    all_users.name = "Renamed Group"
+    assert_not all_users.valid?
+    assert_includes all_users.errors[:name], "cannot be changed for system groups"
+
+    # Verify name was restored
+    assert_equal original_name, all_users.name
+  end
+
+  test "should not rename System Administrators group" do
+    system_admins = Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
+    original_name = system_admins.name
+
+    system_admins.name = "Super Admins"
+    assert_not system_admins.valid?
+    assert_includes system_admins.errors[:name], "cannot be changed for system groups"
+
+    # Verify name was restored
+    assert_equal original_name, system_admins.name
+  end
+
+  test "should allow renaming regular groups" do
+    regular_group = groups(:content_creators)
+    regular_group.name = "New Name"
+
+    assert regular_group.valid?
+    assert regular_group.save
+  end
+
+  test "database should prevent duplicate group names" do
+    existing_group = groups(:content_creators)
+
+    # Attempt to create a duplicate at the database level
+    duplicate_group = Group.new(name: existing_group.name)
+
+    assert_raises(ActiveRecord::RecordNotUnique) do
+      duplicate_group.save(validate: false)  # Bypass validation to test DB constraint
+    end
+  end
+
+  test "should prevent creating second All Registered Users group" do
+    # The first one already exists from fixtures
+    duplicate_group = Group.new(name: Group::REGISTERED_USERS_GROUP_NAME, description: "Duplicate")
+
+    assert_not duplicate_group.valid?
+    assert_includes duplicate_group.errors[:name], "has already been taken"
+  end
+
+  test "should prevent creating second System Administrators group" do
+    # Create the first one
+    Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
+
+    # Try to create a duplicate
+    duplicate_group = Group.new(name: Group::SYSTEM_ADMIN_GROUP_NAME, description: "Duplicate")
+
+    assert_not duplicate_group.valid?
+    assert_includes duplicate_group.errors[:name], "has already been taken"
   end
 end

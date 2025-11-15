@@ -79,7 +79,7 @@ class UserTest < ActiveSupport::TestCase
       password: "password123"
     )
 
-    system_admins_group = Group.find_or_create_by!(name: "System Administrators")
+    system_admins_group = Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
     Membership.create!(user: system_admin_user, group: system_admins_group, role: :admin)
 
     assert system_admin_user.system_admin?
@@ -93,7 +93,7 @@ class UserTest < ActiveSupport::TestCase
       password: "password123"
     )
 
-    system_admins_group = Group.find_or_create_by!(name: "System Administrators")
+    system_admins_group = Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
     Membership.create!(user: member_user, group: system_admins_group, role: :member)
 
     assert_not member_user.system_admin?
@@ -108,7 +108,7 @@ class UserTest < ActiveSupport::TestCase
     )
 
     # Ensure the system administrators group doesn't exist for this test
-    Group.where(name: "System Administrators").destroy_all
+    Group.where(name: Group::SYSTEM_ADMIN_GROUP_NAME).destroy_all
 
     assert_not user_without_group.system_admin?
   end

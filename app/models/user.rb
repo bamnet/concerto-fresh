@@ -63,7 +63,7 @@ class User < ApplicationRecord
   private
 
   def add_to_all_users_group
-    all_users_group = Group.find_or_create_by!(name: "All Registered Users")
+    all_users_group = Group.find_or_create_by!(name: Group::REGISTERED_USERS_GROUP_NAME)
 
     self.groups << all_users_group unless self.groups.include?(all_users_group)
   end
