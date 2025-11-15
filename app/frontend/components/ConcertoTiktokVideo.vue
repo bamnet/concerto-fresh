@@ -35,34 +35,34 @@ function handlePlayerMessage(event) {
   const { type, value } = event.data;
 
   switch (type) {
-    case 'onStateChange':
-      // State values: -1 (init), 0 (ended), 1 (playing), 2 (paused), 3 (buffering)
-      switch (value) {
-        case 1: // playing
-          console.debug('TikTok video is playing');
-          if (!hasDuration.value) {
-            emit('takeOverTimer', {});
-          } else {
-            console.debug('TikTok video has a duration, not taking over timer');
-          }
-          break;
-        case 2: // paused
-          console.debug('TikTok video is paused');
-          break;
-        case 0: // ended
-          console.debug('TikTok video ended');
-          if (!hasDuration.value) {
-            emit('next', {});
-          }
-          break;
+  case 'onStateChange':
+    // State values: -1 (init), 0 (ended), 1 (playing), 2 (paused), 3 (buffering)
+    switch (value) {
+    case 1: // playing
+      console.debug('TikTok video is playing');
+      if (!hasDuration.value) {
+        emit('takeOverTimer', {});
+      } else {
+        console.debug('TikTok video has a duration, not taking over timer');
       }
       break;
-    case 'onPlayerReady':
-      console.debug('TikTok player is ready');
+    case 2: // paused
+      console.debug('TikTok video is paused');
       break;
-    case 'onError':
-      console.error('TikTok player error:', value);
+    case 0: // ended
+      console.debug('TikTok video ended');
+      if (!hasDuration.value) {
+        emit('next', {});
+      }
       break;
+    }
+    break;
+  case 'onPlayerReady':
+    console.debug('TikTok player is ready');
+    break;
+  case 'onError':
+    console.error('TikTok player error:', value);
+    break;
   }
 }
 
