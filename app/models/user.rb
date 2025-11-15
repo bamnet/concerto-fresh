@@ -55,6 +55,11 @@ class User < ApplicationRecord
     user
   end
 
+  # Check if the user is a system administrator.
+  def system_admin?
+    Group.system_admins_group&.admin?(self)
+  end
+
   private
 
   def add_to_all_users_group

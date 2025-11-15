@@ -32,21 +32,30 @@ class Group < ApplicationRecord
     admins.exists?(user.id)
   end
 
-  # Class method to easily find the special group
+  # Class method to easily find the special groups
   def self.all_users_group
     find_by(name: "All Registered Users")
   end
 
+  def self.system_admins_group
+    find_by(name: "System Administrators")
+  end
+
   # Check if this is a system group
   def system_group?
-    name == "All Registered Users"
+    name.in?([ "All Registered Users", "System Administrators" ])
+  end
+
+  # Check if this is the system administrators group
+  def system_admin_group?
+    name == "System Administrators"
   end
 
   private
 
   def cannot_destroy_system_group
     if system_group?
-      errors.add(:base, 'Cannot delete the "All Registered Users" group')
+      errors.add(:base, "Cannot delete a system group")
       throw(:abort)
     end
   end

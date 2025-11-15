@@ -9,6 +9,7 @@
 #   end
 
 Group.find_or_create_by!(name: "All Registered Users")
+Group.find_or_create_by!(name: "System Administrators", description: "System administrators with full access")
 
 system_user = User.find_or_create_by!(is_system_user: true, first_name: "Concerto", last_name: "System User")
 
