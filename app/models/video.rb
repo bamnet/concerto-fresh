@@ -26,6 +26,9 @@ class Video < Content
       elsif video_source == "vimeo"
         match = url.match(/vimeo\.com\/(\d+)/)
         match[1] if match
+      elsif video_source == "tiktok"
+        match = url.match(/tiktok\.com\/@[^\/]+\/video\/(\d+)/)
+        match[1] if match
       end
     end
   end
@@ -38,10 +41,18 @@ class Video < Content
         "www.youtube.com",
         "youtu.be"
       ]
+      tiktok_hosts = [
+        "tiktok.com",
+        "www.tiktok.com",
+        "vm.tiktok.com",
+        "vt.tiktok.com"
+      ]
       if yt_hosts.include?(host)
         "youtube"
       elsif [ "vimeo.com" ].include?(host)
         "vimeo"
+      elsif tiktok_hosts.include?(host)
+        "tiktok"
       end
     end
   end
@@ -57,6 +68,16 @@ class Video < Content
         data["thumbnail_url"]
       rescue => e
         Rails.logger.error "Error fetching Vimeo thumbnail: #{e.message}"
+        ""
+      end
+    elsif video_source == "tiktok"
+      oembed_url = "https://www.tiktok.com/oembed?url=#{url}"
+      begin
+        response = OpenURI.open_uri(oembed_url).read
+        data = JSON.parse(response)
+        data["thumbnail_url"]
+      rescue => e
+        Rails.logger.error "Error fetching TikTok thumbnail: #{e.message}"
         ""
       end
     else
