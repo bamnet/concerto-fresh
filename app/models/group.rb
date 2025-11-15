@@ -1,6 +1,7 @@
 class Group < ApplicationRecord
-  REGISTERED_USERS_GROUP_NAME = "All Registered Users"
-  SYSTEM_ADMIN_GROUP_NAME = "System Administrators"
+  REGISTERED_USERS_GROUP_NAME = "All Registered Users".freeze
+  SYSTEM_ADMIN_GROUP_NAME = "System Administrators".freeze
+  SYSTEM_GROUP_NAMES = [ REGISTERED_USERS_GROUP_NAME, SYSTEM_ADMIN_GROUP_NAME ].freeze
 
   has_many :memberships, dependent: :destroy
   has_many :users, through: :memberships
@@ -49,7 +50,7 @@ class Group < ApplicationRecord
 
   # Check if this is a system group
   def system_group?
-    name.in?([ REGISTERED_USERS_GROUP_NAME, SYSTEM_ADMIN_GROUP_NAME ])
+    name.in?(SYSTEM_GROUP_NAMES)
   end
 
   # Check if this is the system administrators group
@@ -67,14 +68,10 @@ class Group < ApplicationRecord
   end
 
   def cannot_rename_system_group
-    # Check if name is being changed and if the original name was a system group
-    if name_changed? && name_was.present?
-      old_name = name_was
-      if old_name.in?([ REGISTERED_USERS_GROUP_NAME, SYSTEM_ADMIN_GROUP_NAME ])
-        errors.add(:name, "cannot be changed for system groups")
-        # Restore the original name
-        self.name = old_name
-      end
+    if name_changed? && name_was.in?(SYSTEM_GROUP_NAMES)
+      errors.add(:name, "cannot be changed for system groups")
+      # Restore the original name
+      self.name = name_was
     end
   end
 end
