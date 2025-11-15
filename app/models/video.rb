@@ -1,4 +1,5 @@
-require "open-uri"
+require "net/http"
+require "cgi"
 
 class Video < Content
   store_accessor :config, :url
@@ -79,13 +80,13 @@ class Video < Content
 
   # Memoized helper to fetch Vimeo oEmbed data once per request
   def vimeo_oembed_data
-    return @vimeo_oembed_data if defined?(@vimeo_oembed_data)
+    return @vimeo_oembed_data if instance_variable_defined?(:@vimeo_oembed_data)
 
     @vimeo_oembed_data = begin
-      oembed_url = "https://vimeo.com/api/oembed.json?url=#{url}"
-      response = OpenURI.open_uri(oembed_url).read
+      uri = URI("https://vimeo.com/api/oembed.json?url=#{CGI.escape(url)}")
+      response = Net::HTTP.get(uri)
       JSON.parse(response)
-    rescue => e
+    rescue StandardError => e
       Rails.logger.error "Error fetching Vimeo oEmbed data: #{e.message}"
       nil
     end
@@ -94,13 +95,13 @@ class Video < Content
   # Memoized helper to fetch TikTok oEmbed data once per request
   # This supports all TikTok URL formats including short links
   def tiktok_oembed_data
-    return @tiktok_oembed_data if defined?(@tiktok_oembed_data)
+    return @tiktok_oembed_data if instance_variable_defined?(:@tiktok_oembed_data)
 
     @tiktok_oembed_data = begin
-      oembed_url = "https://www.tiktok.com/oembed?url=#{url}"
-      response = OpenURI.open_uri(oembed_url).read
+      uri = URI("https://www.tiktok.com/oembed?url=#{CGI.escape(url)}")
+      response = Net::HTTP.get(uri)
       JSON.parse(response)
-    rescue => e
+    rescue StandardError => e
       Rails.logger.error "Error fetching TikTok oEmbed data: #{e.message}"
       nil
     end
