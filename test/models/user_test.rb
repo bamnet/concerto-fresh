@@ -85,7 +85,7 @@ class UserTest < ActiveSupport::TestCase
     assert system_admin_user.system_admin?
   end
 
-  test "system_admin? returns false when user is member but not admin of system administrators group" do
+  test "system_admin? returns true when user is regular member of system administrators group" do
     member_user = User.create!(
       first_name: "Member",
       last_name: "User",
@@ -96,7 +96,7 @@ class UserTest < ActiveSupport::TestCase
     system_admins_group = Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
     Membership.create!(user: member_user, group: system_admins_group, role: :member)
 
-    assert_not member_user.system_admin?
+    assert member_user.system_admin?
   end
 
   test "system_admin? returns false when system administrators group does not exist" do

@@ -21,47 +21,57 @@ class ScreenPolicy < ApplicationPolicy
   end
 
   def new?
-    # Screens can be created by any admin of any group.
-    return false unless user
-    user.admin_groups.any?
+    super || begin
+      # Screens can be created by any admin of any group.
+      return false unless user
+      user.admin_groups.any?
+    end
   end
 
   def create?
-    # Screens can be created by any admin of the associated group.
-    return false unless user
-    record.group.admin?(user)
+    super || begin
+      # Screens can be created by any admin of the associated group.
+      return false unless user
+      record.group.admin?(user)
+    end
   end
 
   def edit?
-    # Screens can be edited by any member of the associated group.
-    return false unless user
-    record.group.member?(user)
+    super || begin
+      # Screens can be edited by any member of the associated group.
+      return false unless user
+      record.group.member?(user)
+    end
   end
 
   def update?
-    return false unless edit?
+    super || begin
+      return false unless edit?
 
-    # If group_id is being changed, ensure user is admin of both
-    # the current group and the new group.
-    if record.group_id_changed?
-      # Check permissions on the old group, if it existed.
-      if record.group_id_was.present?
-        old_group = Group.find_by(id: record.group_id_was)
-        return false unless old_group&.admin?(user)
+      # If group_id is being changed, ensure user is admin of both
+      # the current group and the new group.
+      if record.group_id_changed?
+        # Check permissions on the old group, if it existed.
+        if record.group_id_was.present?
+          old_group = Group.find_by(id: record.group_id_was)
+          return false unless old_group&.admin?(user)
+        end
+
+        # Check permissions on the new group.
+        # The `record` is already associated with the new group object.
+        return false unless record.group&.admin?(user)
       end
 
-      # Check permissions on the new group.
-      # The `record` is already associated with the new group object.
-      return false unless record.group&.admin?(user)
+      true
     end
-
-    true
   end
 
   def destroy?
-    # Screens can be deleted by any admin of the associated group.
-    return false unless user
-    record.group.admin?(user)
+    super || begin
+      # Screens can be deleted by any admin of the associated group.
+      return false unless user
+      record.group.admin?(user)
+    end
   end
 
   def permitted_attributes
@@ -76,6 +86,7 @@ class ScreenPolicy < ApplicationPolicy
   #
   # This is used both in the policy and in the view to disable UI elements.
   def can_edit_group?
+    return true if user&.system_admin?
     return false unless user
     record.new_record? || record.group.admin?(user)
   end
