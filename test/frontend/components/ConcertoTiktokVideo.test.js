@@ -10,7 +10,8 @@ describe('ConcertoTiktokVideo', () => {
     };
     const wrapper = mount(ConcertoTiktokVideo, { props: { content: content } });
 
-    expect(wrapper.html()).toContain('src="https://www.tiktok.com/player/v1/6718335390845095173?autoplay=1&amp;muted=1&amp;loop=0&amp;controls=0');
+    const iframe = wrapper.find('iframe');
+    expect(iframe.attributes('src')).toBe('https://www.tiktok.com/player/v1/6718335390845095173?autoplay=1&muted=1&loop=0&controls=0');
   })
 })
 
@@ -29,6 +30,7 @@ describe('ConcertoTiktokVideo duration control', () => {
 
     // Simulate TikTok player message for playing state
     const event = new MessageEvent('message', {
+      origin: 'https://www.tiktok.com',
       data: {
         'x-tiktok-player': true,
         type: 'onStateChange',
@@ -51,6 +53,7 @@ describe('ConcertoTiktokVideo duration control', () => {
 
     // Simulate TikTok player message for ended state
     const event = new MessageEvent('message', {
+      origin: 'https://www.tiktok.com',
       data: {
         'x-tiktok-player': true,
         type: 'onStateChange',
@@ -73,6 +76,7 @@ describe('ConcertoTiktokVideo duration control', () => {
 
     // Simulate TikTok player message for playing state
     const event = new MessageEvent('message', {
+      origin: 'https://www.tiktok.com',
       data: {
         'x-tiktok-player': true,
         type: 'onStateChange',
@@ -95,8 +99,32 @@ describe('ConcertoTiktokVideo duration control', () => {
 
     // Simulate a message without the x-tiktok-player flag
     const event = new MessageEvent('message', {
+      origin: 'https://www.tiktok.com',
       data: {
         type: 'someOtherEvent',
+        value: 1
+      }
+    });
+
+    window.dispatchEvent(event);
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.emitted('takeOverTimer')).toBeFalsy();
+  });
+
+  it('ignores messages from untrusted origins', async () => {
+    const content = {
+      video_id: '6718335390845095173',
+      duration: null
+    };
+    const wrapper = mount(ConcertoTiktokVideo, { props: { content: content } });
+
+    // Simulate a message from a malicious origin
+    const event = new MessageEvent('message', {
+      origin: 'https://evil.com',
+      data: {
+        'x-tiktok-player': true,
+        type: 'onStateChange',
         value: 1
       }
     });
