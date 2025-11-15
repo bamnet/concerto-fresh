@@ -65,15 +65,8 @@ class Video < Content
     if video_source == "youtube"
       "https://img.youtube.com/vi/#{video_id}/mqdefault.jpg"
     elsif video_source == "vimeo"
-      oembed_url = "https://vimeo.com/api/oembed.json?url=#{url}"
-      begin
-        response = OpenURI.open_uri(oembed_url).read
-        data = JSON.parse(response)
-        data["thumbnail_url"]
-      rescue => e
-        Rails.logger.error "Error fetching Vimeo thumbnail: #{e.message}"
-        ""
-      end
+      data = vimeo_oembed_data
+      data&.dig("thumbnail_url") || ""
     elsif video_source == "tiktok"
       data = tiktok_oembed_data
       data&.dig("thumbnail_url") || ""
@@ -83,6 +76,20 @@ class Video < Content
   end
 
   private
+
+  # Memoized helper to fetch Vimeo oEmbed data once per request
+  def vimeo_oembed_data
+    return @vimeo_oembed_data if defined?(@vimeo_oembed_data)
+
+    @vimeo_oembed_data = begin
+      oembed_url = "https://vimeo.com/api/oembed.json?url=#{url}"
+      response = OpenURI.open_uri(oembed_url).read
+      JSON.parse(response)
+    rescue => e
+      Rails.logger.error "Error fetching Vimeo oEmbed data: #{e.message}"
+      nil
+    end
+  end
 
   # Memoized helper to fetch TikTok oEmbed data once per request
   # This supports all TikTok URL formats including short links
