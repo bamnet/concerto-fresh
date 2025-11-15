@@ -9,7 +9,7 @@
 #   end
 
 Group.find_or_create_by!(name: Group::REGISTERED_USERS_GROUP_NAME)
-Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME, description: "System administrators with full access to the application")
+Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME, description: "System administrators with full access to Concerto.")
 
 system_user = User.find_or_create_by!(is_system_user: true, first_name: "Concerto", last_name: "System User")
 
