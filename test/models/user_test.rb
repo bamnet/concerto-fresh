@@ -72,17 +72,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "system_admin? returns true for system administrators" do
-    system_admin_user = User.create!(
-      first_name: "System",
-      last_name: "Admin",
-      email: "sysadmin@example.com",
-      password: "password123"
-    )
-
-    system_admins_group = Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
-    Membership.create!(user: system_admin_user, group: system_admins_group, role: :admin)
-
-    assert system_admin_user.system_admin?
+    assert users(:system_admin).system_admin?
   end
 
   test "system_admin? returns true when user is regular member of system administrators group" do
@@ -93,7 +83,7 @@ class UserTest < ActiveSupport::TestCase
       password: "password123"
     )
 
-    system_admins_group = Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
+    system_admins_group = groups(:system_administrators)
     Membership.create!(user: member_user, group: system_admins_group, role: :member)
 
     assert member_user.system_admin?
