@@ -39,11 +39,12 @@ class Group < ApplicationRecord
     admins.exists?(user.id)
   end
 
-  # Class method to easily find the special groups
+  # Class method to easily find the all users group.
   def self.all_users_group
     find_by(name: REGISTERED_USERS_GROUP_NAME)
   end
 
+  # Class method to easily find the system administrators group.
   def self.system_admins_group
     find_by(name: SYSTEM_ADMIN_GROUP_NAME)
   end
