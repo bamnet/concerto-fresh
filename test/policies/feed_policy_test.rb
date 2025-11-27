@@ -39,13 +39,19 @@ class FeedPolicyTest < ActiveSupport::TestCase
     refute FeedPolicy.new(@group_regular_user, Feed.new).new?
   end
 
-  # NOTE: The following tests assume Feed will have a group association in the future
-  # For now, they test the system admin path only
-
   test "create? is permitted for system admin" do
     assert FeedPolicy.new(@system_admin_user, @feed).create?
   end
 
+  test "create? is permitted for user who is an admin of any group" do
+    assert FeedPolicy.new(@group_admin_user, Feed.new).create?
+  end
+
+  test "create? is denied for user who is not an admin of any group" do
+    refute FeedPolicy.new(@group_regular_user, Feed.new).create?
+  end
+
+  # The following require system admin until Feed has group association
   test "edit? is permitted for system admin" do
     assert FeedPolicy.new(@system_admin_user, @feed).edit?
   end
@@ -58,20 +64,15 @@ class FeedPolicyTest < ActiveSupport::TestCase
     assert FeedPolicy.new(@system_admin_user, @feed).destroy?
   end
 
-  # Without group association, non-system admins cannot modify feeds
-  test "create? is denied for non-system admin without group" do
-    refute FeedPolicy.new(@group_admin_user, @feed).create?
-  end
-
-  test "edit? is denied for non-system admin without group" do
+  test "edit? is denied for non-system admin" do
     refute FeedPolicy.new(@group_admin_user, @feed).edit?
   end
 
-  test "update? is denied for non-system admin without group" do
+  test "update? is denied for non-system admin" do
     refute FeedPolicy.new(@group_admin_user, @feed).update?
   end
 
-  test "destroy? is denied for non-system admin without group" do
+  test "destroy? is denied for non-system admin" do
     refute FeedPolicy.new(@group_admin_user, @feed).destroy?
   end
 

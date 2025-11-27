@@ -29,11 +29,11 @@ class ContentPolicy < ApplicationPolicy
   end
 
   def update?
-    super || can_update_content?
+    super || can_edit_content?
   end
 
   def destroy?
-    super || can_destroy_content?
+    super || can_edit_content?
   end
 
   private
@@ -43,19 +43,8 @@ class ContentPolicy < ApplicationPolicy
     user.present?
   end
 
-  # Content can only be updated by the owner
+  # Content can only be updated/destroyed by the owner
   def can_edit_content?
-    return false unless user
-    record.user_id == user.id
-  end
-
-  # Content can only be updated by the owner
-  def can_update_content?
-    can_edit_content?
-  end
-
-  # Content can only be destroyed by the owner
-  def can_destroy_content?
     return false unless user
     record.user_id == user.id
   end

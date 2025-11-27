@@ -13,7 +13,7 @@ class GroupPolicyTest < ActiveSupport::TestCase
     resolved_scope = GroupPolicy::Scope.new(nil, Group.all).resolve
     assert_equal Group.all.to_a, resolved_scope.to_a
 
-    resolved_scope = GroupPolicy::Scope.new(@regular_user, Group.all).resolve
+    resolved_scope = GroupPolicy::Scope.new(@group_regular_user, Group.all).resolve
     assert_equal Group.all.to_a, resolved_scope.to_a
   end
 

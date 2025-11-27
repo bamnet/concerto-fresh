@@ -31,7 +31,7 @@ class GroupPolicy < ApplicationPolicy
   end
 
   def update?
-    super || can_update_group?
+    super || can_edit_group?
   end
 
   def destroy?
@@ -45,9 +45,5 @@ class GroupPolicy < ApplicationPolicy
   def can_edit_group?
     return false unless user
     record.admin?(user)
-  end
-
-  def can_update_group?
-    can_edit_group?
   end
 end

@@ -42,13 +42,13 @@ class MembershipPolicy < ApplicationPolicy
   # Only admins of the group may create memberships
   def can_create_membership?
     return false unless user
+    return false unless record.group.present?
     record.group.admin?(user)
   end
 
   # Only admins of the group may edit memberships
   def can_edit_membership?
-    return false unless user
-    record.group.admin?(user)
+    can_create_membership?
   end
 
   # Only admins of the group may update memberships
@@ -62,6 +62,7 @@ class MembershipPolicy < ApplicationPolicy
     # User can remove themselves
     return true if record.user_id == user.id
     # Or admins of the group can remove anyone
+    return false unless record.group.present?
     record.group.admin?(user)
   end
 
@@ -78,8 +79,6 @@ class MembershipPolicy < ApplicationPolicy
   # Helper method to determine if the user can edit the role field
   # Only admins of the group can set/update the role field
   def can_edit_role?
-    return true if user&.system_admin?
-    return false unless user
-    record.group.admin?(user)
+    user.present? && (user.system_admin? || (record.group.present? && record.group.admin?(user)))
   end
 end

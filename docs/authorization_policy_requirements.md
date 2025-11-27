@@ -190,7 +190,7 @@ Positions are managed alongside templates. See template for their instructions.
 
 Feeds work very similiarly to screens.
 
-**Scope**: All users (including anonymous) can see all fields (for now - we may add options here in the future).
+**Scope**: All users (including anonymous) can see all feeds (for now - we may add options here in the future).
 
 **Index**: Everyone can view the list
 
@@ -220,7 +220,7 @@ Feeds work very similiarly to screens.
 
 **Create**: All signed-in users can create content
 
-**Update**: Content can only be updated by the owher
+**Update**: Content can only be updated by the owner
 
 **Destroy**: Content can only be destroyed by the owner
 
@@ -244,7 +244,7 @@ Feeds work very similiarly to screens.
 
 ### Setting Policy
 
-Settings are only for use by system adminstrators and should not be viewable / create / edit / destroy / etc by other users.
+Settings are only for use by system administrators and should not be viewable / create / edit / destroy / etc by other users.
 
 
 ---

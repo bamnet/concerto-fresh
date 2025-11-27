@@ -21,19 +21,23 @@ class FeedPolicy < ApplicationPolicy
   end
 
   def create?
-    super || can_create_feed?
+    # Once Feed has group_id, this will check group admin permissions
+    super || can_create_new_feed?
   end
 
   def edit?
-    super || can_edit_feed?
+    # Once Feed has group_id, this will check group member permissions
+    super
   end
 
   def update?
-    super || can_update_feed?
+    # Once Feed has group_id, this will check group member permissions
+    super
   end
 
   def destroy?
-    super || can_destroy_feed?
+    # Once Feed has group_id, this will check group admin permissions
+    super
   end
 
   private
@@ -44,67 +48,11 @@ class FeedPolicy < ApplicationPolicy
     user.admin_groups.any?
   end
 
-  # Feeds can be created by any admin of the associated group
-  # NOTE: This assumes Feed will have a group association in the future
-  def can_create_feed?
-    return false unless user
-    return false unless record.respond_to?(:group) && record.group.present?
-    record.group.admin?(user)
-  end
-
-  # Feeds can be edited by any member of the associated group
-  # NOTE: This assumes Feed will have a group association in the future
-  def can_edit_feed?
-    return false unless user
-    return false unless record.respond_to?(:group) && record.group.present?
-    record.group.member?(user)
-  end
-
-  # Feeds can be updated by members of the group, but group changes
-  # require admin permissions on both the old and new groups
-  # NOTE: This assumes Feed will have a group association in the future
-  def can_update_feed?
-    return false unless can_edit_feed?
-
-    # If group_id is being changed, ensure user is admin of both
-    # the current group and the new group
-    if record.respond_to?(:group_id_changed?) && record.group_id_changed?
-      # Check permissions on the old group, if it existed
-      if record.group_id_was.present?
-        old_group = Group.find_by(id: record.group_id_was)
-        return false unless old_group&.admin?(user)
-      end
-
-      # Check permissions on the new group
-      return false unless record.group&.admin?(user)
-    end
-
-    true
-  end
-
-  # Feeds can be deleted by any admin of the associated group
-  # NOTE: This assumes Feed will have a group association in the future
-  def can_destroy_feed?
-    return false unless user
-    return false unless record.respond_to?(:group) && record.group.present?
-    record.group.admin?(user)
-  end
-
   public
 
   def permitted_attributes
-    if can_edit_group?
-      [ :name, :description, :type, :config, :group_id ]
-    else
-      [ :name, :description, :type, :config ]
-    end
-  end
-
-  # Helper method to determine if the user can edit the group which owns a feed
-  def can_edit_group?
-    return true if user&.system_admin?
-    return false unless user
-    return false unless record.respond_to?(:group) && record.group.present?
-    record.new_record? || record.group.admin?(user)
+    # System admins can edit all attributes
+    # Once Feed has group_id, non-admins will have restricted permissions
+    [ :name, :description, :type, :config, :group_id ]
   end
 end

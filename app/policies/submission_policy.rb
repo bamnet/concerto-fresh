@@ -42,25 +42,12 @@ class SubmissionPolicy < ApplicationPolicy
 
   # Only the owner of a piece of content can create a submission
   def can_create_submission?
-    return false unless user
-    return false unless record.content.present?
-    record.content.user_id == user.id
+    user && record.content&.user_id == user.id
   end
 
-  # Submissions may be deleted by the owner of the piece of content,
-  # or a member of the group owning the associated feed
+  # Submissions may be deleted by the owner of the piece of content
   def can_destroy_submission?
     return false unless user
-
-    # Content owner can delete their submissions
-    return true if record.content.user_id == user.id
-
-    # Member of the group owning the feed can delete
-    # NOTE: This assumes Feed will have a group association in the future
-    if record.feed.respond_to?(:group) && record.feed.group.present?
-      return true if record.feed.group.member?(user)
-    end
-
-    false
+    record.content.user_id == user.id
   end
 end

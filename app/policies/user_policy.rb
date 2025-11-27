@@ -32,27 +32,17 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
-    super || can_update_user?
+    super || can_edit_user?
   end
 
   def destroy?
-    super || can_destroy_user?
+    super || can_edit_user?
   end
 
   private
 
-  # A user may only update themselves (system admins can update anyone via super)
+  # A user may only update/destroy themselves (system admins can manage anyone via super)
   def can_edit_user?
-    return false unless user
-    user.id == record.id
-  end
-
-  def can_update_user?
-    can_edit_user?
-  end
-
-  # A user may only destroy themselves (system admins can destroy anyone via super)
-  def can_destroy_user?
     return false unless user
     user.id == record.id
   end
