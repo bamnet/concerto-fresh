@@ -1,4 +1,7 @@
 class AdminController < ApplicationController
+  before_action :authenticate_user!
+  after_action :verify_authorized
+
   def settings
     # Authorize viewing settings (system admin only)
     authorize Setting, :index?
@@ -18,6 +21,7 @@ class AdminController < ApplicationController
   private
 
   def setting_params
-    params.require(:settings).permit!
+    # Only permit known setting keys to prevent mass assignment vulnerabilities
+    params.require(:settings).permit(Setting.pluck(:key))
   end
 end

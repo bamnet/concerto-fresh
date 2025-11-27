@@ -10,7 +10,7 @@ class AdminControllerTest < ActionDispatch::IntegrationTest
   test "settings index requires system admin" do
     sign_in @regular_user
     get admin_settings_path
-    assert_redirected_to screens_path
+    assert_redirected_to root_path
     assert_equal "You are not authorized to perform this action.", flash[:alert]
   end
 
@@ -19,7 +19,7 @@ class AdminControllerTest < ActionDispatch::IntegrationTest
     patch admin_settings_path, params: {
       settings: { site_name: "Hacked" }
     }
-    assert_redirected_to screens_path
+    assert_redirected_to root_path
     assert_equal "You are not authorized to perform this action.", flash[:alert]
     # Verify the setting was NOT updated
     refute_equal "Hacked", Setting[:site_name]
