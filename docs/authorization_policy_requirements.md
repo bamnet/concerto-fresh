@@ -253,16 +253,16 @@ Settings are only for use by system adminstrators and should not be viewable / c
 
 Once requirements are defined above, implement each policy:
 
-- [ ] User Policy
-- [ ] Group Policy
-- [ ] Membership Policy
-- [ ] Template Policy
-- [ ] Position Policy
-- [ ] Field Policy
-- [ ] Feed Policy (including RssFeed)
-- [ ] Content Policy (including RichText, Graphic, Video)
-- [ ] Submission Policy
-- [ ] Setting Policy
+- [x] User Policy
+- [x] Group Policy
+- [x] Membership Policy
+- [x] Template Policy
+- [x] Position Policy
+- [x] Field Policy
+- [x] Feed Policy (including RssFeed)
+- [x] Content Policy (including RichText, Graphic, Video)
+- [x] Submission Policy
+- [x] Setting Policy
 
 For each policy:
 1. Create `app/policies/{model}_policy.rb`
