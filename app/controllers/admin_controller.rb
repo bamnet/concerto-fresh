@@ -1,9 +1,14 @@
 class AdminController < ApplicationController
   def settings
+    # Authorize viewing settings (system admin only)
+    authorize Setting, :index?
     @settings = Setting.all.group_by { |s| s.key.split("_").first }
   end
 
   def update_settings
+    # Authorize that the user can update settings
+    authorize Setting, :update?
+
     setting_params.each do |key, value|
       Setting[key] = value
     end
