@@ -10,8 +10,13 @@ class GroupsControllerTest < ActionDispatch::IntegrationTest
   end
 
   # Authorization tests
-  test "unauthenticated users cannot access groups" do
+  test "unauthenticated users cannot access groups index" do
     get groups_url
+    assert_redirected_to new_user_session_path
+  end
+
+  test "unauthenticated users cannot view group details" do
+    get group_url(@group)
     assert_redirected_to new_user_session_path
   end
 

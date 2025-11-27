@@ -13,9 +13,10 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "unauthenticated users can view user profiles" do
+  test "unauthenticated users cannot view user profiles" do
     get user_url(@user)
-    assert_response :success
+    assert_redirected_to root_path
+    assert_equal "You are not authorized to perform this action.", flash[:alert]
   end
 
   # Original functionality tests
