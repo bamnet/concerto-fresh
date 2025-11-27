@@ -47,12 +47,7 @@ class MembershipsController < ApplicationController
 
   def membership_params
     # Use policy-based permitted attributes for dynamic strong parameters
-    if action_name == "create"
-      # For new memberships, build a temporary membership to check permissions
-      temp_membership = @group.memberships.build
-      params.require(:membership).permit(policy(temp_membership).permitted_attributes)
-    else
-      params.require(:membership).permit(policy(@membership).permitted_attributes)
-    end
+    target_membership = @membership || @group.memberships.build
+    params.require(:membership).permit(policy(target_membership).permitted_attributes)
   end
 end

@@ -114,7 +114,7 @@ class MembershipsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
   end
 
-  test "regular users cannot set admin role when creating membership" do
+  test "group admins can set admin role when creating membership" do
     sign_in @admin_user
     new_user = User.create!(
       email: "newuser4@test.com",
