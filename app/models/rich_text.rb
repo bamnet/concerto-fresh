@@ -1,11 +1,6 @@
 class RichText < Content
     store_accessor :config, :render_as
 
-    # Use ContentPolicy for Pundit authorization
-    def self.policy_class
-      ContentPolicy
-    end
-
     # render_as is an enum-like structure. Ideally we would use rails'
     # ActtiveRecord::Enum functionality, but it doesn't work store_accessor.
     def html? = render_as == "html"

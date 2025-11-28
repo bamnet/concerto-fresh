@@ -3,11 +3,6 @@ class Graphic < Content
     attachable.variant :grid, resize_to_limit: [ nil, 400 ]
   end
 
-  # Use ContentPolicy for Pundit authorization
-  def self.policy_class
-    ContentPolicy
-  end
-
   # URL Helpers are needed so we can generate a URL to the image in the JSON.
   include Rails.application.routes.url_helpers
 

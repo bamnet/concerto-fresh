@@ -4,11 +4,6 @@ require "cgi"
 class Video < Content
   store_accessor :config, :url
 
-  # Use ContentPolicy for Pundit authorization
-  def self.policy_class
-    ContentPolicy
-  end
-
   def as_json(options = {})
     super(options).merge({
       video_id: video_id,
