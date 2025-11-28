@@ -4,11 +4,6 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @submission = submissions(:three)  # content owned by admin
     @admin = users(:admin)
-    sign_in @admin
-  end
-
-  teardown do
-    sign_out :user
   end
 
   test "should get index" do
@@ -16,12 +11,14 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should get new" do
+  test "should get new when signed in" do
+    sign_in @admin
     get new_submission_url
     assert_response :success
   end
 
   test "should create submission" do
+    sign_in @admin
     content = rich_texts(:plain_richtext)  # owned by admin
     feed = feeds(:one)
     assert_difference("Submission.count") do
@@ -36,17 +33,20 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should get edit" do
+  test "should get edit when signed in as system admin" do
+    sign_in users(:system_admin)
     get edit_submission_url(@submission)
     assert_response :success
   end
 
-  test "should update submission" do
+  test "should update submission when signed in as system admin" do
+    sign_in users(:system_admin)
     patch submission_url(@submission), params: { submission: { content_id: @submission.content_id, feed_id: @submission.feed_id } }
     assert_redirected_to submission_url(@submission)
   end
 
   test "should destroy submission" do
+    sign_in @admin
     assert_difference("Submission.count", -1) do
       delete submission_url(@submission)
     end
@@ -56,7 +56,7 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
 
   # Authorization tests
   test "should allow content owner to create submission" do
-    sign_in users(:admin)
+    sign_in @admin
     content = rich_texts(:plain_richtext)  # owned by admin
     feed = feeds(:one)
 
@@ -79,7 +79,7 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should allow content owner to destroy their submission" do
-    sign_in users(:admin)
+    sign_in @admin
     submission = submissions(:three)  # content owned by admin
 
     assert_difference("Submission.count", -1) do

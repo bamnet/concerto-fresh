@@ -45,7 +45,9 @@ class SubmissionPolicy < ApplicationPolicy
     return false unless user
     # For class-level checks (e.g., policy(Submission).create?), allow signed-in users
     return true if record.is_a?(Class)
-    # For instance-level checks, verify content ownership
+    # For new records without content selected yet, allow signed-in users to access the form
+    return true if record.new_record? && record.content.nil?
+    # For instance-level checks with content, verify content ownership
     record.content&.user_id == user.id
   end
 
