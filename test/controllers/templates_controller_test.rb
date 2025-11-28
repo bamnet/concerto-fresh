@@ -72,6 +72,8 @@ class TemplatesControllerTest < ActionDispatch::IntegrationTest
     sign_in @system_admin
     patch template_url(@template), params: { template: { name: "Updated Name" } }
     assert_redirected_to template_url(@template)
+    @template.reload
+    assert_equal "Updated Name", @template.name
   end
 
   test "only system admins can destroy templates" do
