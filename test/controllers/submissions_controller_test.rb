@@ -2,7 +2,13 @@ require "test_helper"
 
 class SubmissionsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @submission = submissions(:one)
+    @submission = submissions(:three)  # content owned by admin
+    @admin = users(:admin)
+    sign_in @admin
+  end
+
+  teardown do
+    sign_out :user
   end
 
   test "should get index" do
@@ -16,8 +22,10 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create submission" do
+    content = rich_texts(:plain_richtext)  # owned by admin
+    feed = feeds(:one)
     assert_difference("Submission.count") do
-      post submissions_url, params: { submission: { content_id: @submission.content_id, feed_id: @submission.feed_id } }
+      post submissions_url, params: { submission: { content_id: content.id, feed_id: feed.id } }
     end
 
     assert_redirected_to submission_url(Submission.last)

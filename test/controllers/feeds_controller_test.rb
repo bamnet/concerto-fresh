@@ -3,6 +3,12 @@ require "test_helper"
 class FeedsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @feed = feeds(:one)
+    @system_user = users(:system_admin)
+    sign_in @system_user
+  end
+
+  teardown do
+    sign_out :user
   end
 
   test "should get index" do
@@ -65,7 +71,7 @@ class FeedsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should allow system user to update feed" do
-    sign_in users(:system_user)
+    sign_in users(:system_admin)
     patch feed_url(@feed), params: { feed: { name: "Updated by system user" } }
     assert_redirected_to feed_url(@feed)
     @feed.reload
@@ -82,7 +88,7 @@ class FeedsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should allow system user to destroy feed" do
-    sign_in users(:system_user)
+    sign_in users(:system_admin)
     assert_difference("Feed.count", -1) do
       delete feed_url(@feed)
     end
