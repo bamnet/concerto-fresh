@@ -74,6 +74,6 @@ class RichTextsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def rich_text_params
-      params.require(:rich_text).permit(*ContentsController::PARAMS, :text, :render_as)
+      params.require(:rich_text).permit(policy(@rich_text || RichText.new).permitted_attributes + [ :text, :render_as ])
     end
 end

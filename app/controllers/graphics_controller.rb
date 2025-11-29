@@ -79,6 +79,6 @@ class GraphicsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def graphic_params
-      params.require(:graphic).permit(*ContentsController::PARAMS, :image)
+      params.require(:graphic).permit(policy(@graphic || Graphic.new).permitted_attributes + [ :image ])
     end
 end

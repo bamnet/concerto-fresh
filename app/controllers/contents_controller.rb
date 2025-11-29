@@ -1,7 +1,4 @@
 class ContentsController < ApplicationController
-  # Common parameters for creating a content
-  PARAMS = [ :name, :duration, :start_time, :end_time, feed_ids: [] ].freeze
-
   before_action :authenticate_user!, only: :new
   after_action :verify_authorized, except: :index
   after_action :verify_policy_scoped, only: :index
