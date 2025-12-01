@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="h-full bg-neutral-100">
   <head>
-    <title>Concerto <%= content_for?(:title) ? " - " + yield(:title) : "" %> </title>
+    <title>Concerto<%= raw content_for?(:title) ? " - #{yield(:title)}" : "" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Concerto">
