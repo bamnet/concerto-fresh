@@ -38,6 +38,11 @@
   user-select: none;
 }
 
+.position-label.label-below {
+  top: auto;
+  bottom: -26px;
+}
+
 .position-rectangle.selected .position-label {
   background: #0056B3;
 }

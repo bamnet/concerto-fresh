@@ -5,6 +5,7 @@ export default class extends Controller {
   static targets = [
     "canvas",
     "image",
+    "placeholder",
     "positionsList",
     "inspector",
     "fieldSelect",
@@ -63,6 +64,11 @@ export default class extends Controller {
         this.imageHeight = img.height
         this.imageTarget.src = e.target.result
         this.imageTarget.style.display = 'block'
+
+        // Hide placeholder
+        if (this.hasPlaceholderTarget) {
+          this.placeholderTarget.style.display = 'none'
+        }
 
         // Re-render all positions with new image dimensions
         this.clearCanvas()
@@ -190,6 +196,10 @@ export default class extends Controller {
     // Add label
     const label = document.createElement('div')
     label.className = 'position-label'
+    // Position label below if position is near top of canvas
+    if (position.top < 0.08) {
+      label.classList.add('label-below')
+    }
     label.textContent = position.field_name || `Position ${position.id}`
     rect.appendChild(label)
 
@@ -402,20 +412,50 @@ export default class extends Controller {
     return Math.min(scaleX, scaleY)
   }
 
-  // Get default field ID
+  // Get default field ID - prefers unused fields
   getDefaultFieldId() {
-    if (this.hasFieldSelectTarget && this.fieldSelectTarget.options.length > 0) {
-      return this.fieldSelectTarget.options[0].value
+    if (!this.hasFieldSelectTarget || this.fieldSelectTarget.options.length === 0) {
+      return null
     }
-    return null
+
+    // Get all field IDs currently in use (excluding destroyed positions)
+    const usedFieldIds = this.positions
+      .filter(p => !p._destroy)
+      .map(p => p.field_id?.toString())
+
+    // Find first unused field
+    for (let i = 0; i < this.fieldSelectTarget.options.length; i++) {
+      const option = this.fieldSelectTarget.options[i]
+      if (!usedFieldIds.includes(option.value)) {
+        return option.value
+      }
+    }
+
+    // If all fields are used, return the first one
+    return this.fieldSelectTarget.options[0].value
   }
 
-  // Get default field name
+  // Get default field name - matches the default field ID
   getDefaultFieldName() {
-    if (this.hasFieldSelectTarget && this.fieldSelectTarget.options.length > 0) {
-      return this.fieldSelectTarget.options[0].text
+    if (!this.hasFieldSelectTarget || this.fieldSelectTarget.options.length === 0) {
+      return 'Unnamed'
     }
-    return 'Unnamed'
+
+    // Get all field IDs currently in use (excluding destroyed positions)
+    const usedFieldIds = this.positions
+      .filter(p => !p._destroy)
+      .map(p => p.field_id?.toString())
+
+    // Find first unused field
+    for (let i = 0; i < this.fieldSelectTarget.options.length; i++) {
+      const option = this.fieldSelectTarget.options[i]
+      if (!usedFieldIds.includes(option.value)) {
+        return option.text
+      }
+    }
+
+    // If all fields are used, return the first one
+    return this.fieldSelectTarget.options[0].text
   }
 
   // Update hidden form fields before submission
