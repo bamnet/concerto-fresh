@@ -536,4 +536,141 @@ export default class extends Controller {
   submitForm() {
     this.updateHiddenFields()
   }
+
+  // Handle import from template-importer controller
+  handleImport(event) {
+    const { template, imageBlob } = event.detail
+
+    // Populate form fields
+    const nameField = this.element.querySelector('input[name="template[name]"]')
+    const authorField = this.element.querySelector('input[name="template[author]"]')
+
+    if (nameField) nameField.value = template.name
+    if (authorField) authorField.value = template.author
+
+    // Load image
+    this.loadImageFromBlob(imageBlob)
+
+    // Map field names to IDs and populate positions
+    this.importPositions(template.positions)
+  }
+
+  loadImageFromBlob(blob) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        this.imageWidth = img.width
+        this.imageHeight = img.height
+        this.imageTarget.src = e.target.result
+        this.imageTarget.style.display = 'block'
+
+        if (this.hasPlaceholderTarget) {
+          this.placeholderTarget.style.display = 'none'
+        }
+
+        if (this.hasAddPositionButtonTarget) {
+          this.addPositionButtonTarget.disabled = false
+        }
+
+        // Re-render positions with correct dimensions
+        this.clearCanvas()
+        this.positions.forEach(pos => this.renderPosition(pos))
+      }
+      img.src = e.target.result
+    }
+    reader.readAsDataURL(blob)
+
+    // Also set the file input for form submission
+    this.setImageFile(blob)
+  }
+
+  setImageFile(blob) {
+    // Create File object from Blob for form submission
+    const file = new File([blob], "imported-background.jpg", { type: blob.type })
+
+    // Use DataTransfer to set file input value
+    const dataTransfer = new DataTransfer()
+    dataTransfer.items.add(file)
+    this.imageInputTarget.files = dataTransfer.files
+  }
+
+  importPositions(importedPositions) {
+    // Clear existing positions
+    this.positions = []
+    this.nextId = 1
+    this.clearCanvas()
+
+    // Map field names to field IDs
+    importedPositions.forEach((pos) => {
+      const fieldId = this.findFieldIdByName(pos.field_name)
+
+      const position = {
+        id: `pos_${this.nextId++}`,
+        field_id: fieldId,
+        field_name: this.getFieldNameById(fieldId) || pos.field_name,
+        left: pos.left,
+        top: pos.top,
+        right: pos.right,
+        bottom: pos.bottom,
+        style: pos.style,
+        _destroy: false,
+        _imported_name: pos.field_name, // Store original for warning
+        _field_found: !!fieldId
+      }
+
+      this.positions.push(position)
+      this.renderPosition(position)
+    })
+
+    this.updatePositionsList()
+    this.showImportWarnings()
+  }
+
+  findFieldIdByName(name) {
+    if (!this.hasFieldSelectTarget) return null
+
+    // Try exact match first
+    for (let option of this.fieldSelectTarget.options) {
+      if (option.text.toLowerCase() === name.toLowerCase()) {
+        return option.value
+      }
+    }
+
+    // Try partial match
+    for (let option of this.fieldSelectTarget.options) {
+      if (option.text.toLowerCase().includes(name.toLowerCase()) ||
+          name.toLowerCase().includes(option.text.toLowerCase())) {
+        return option.value
+      }
+    }
+
+    // No match found
+    return null
+  }
+
+  getFieldNameById(fieldId) {
+    if (!this.hasFieldSelectTarget || !fieldId) return null
+
+    for (let option of this.fieldSelectTarget.options) {
+      if (option.value === fieldId) {
+        return option.text
+      }
+    }
+
+    return null
+  }
+
+  showImportWarnings() {
+    const unmappedPositions = this.positions.filter(p => !p._field_found)
+
+    if (unmappedPositions.length > 0) {
+      const names = unmappedPositions.map(p => `"${p._imported_name}"`).join(', ')
+      alert(
+        `Warning: Could not map the following fields: ${names}\n\n` +
+        `These positions were imported but you'll need to manually assign fields. ` +
+        `Click each position and select the correct field from the dropdown.`
+      )
+    }
+  }
 }

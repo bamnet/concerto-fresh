@@ -44,6 +44,19 @@ class TemplatesTest < ApplicationSystemTestCase
     click_on "Back"
   end
 
+  test "should show import button on new template" do
+    sign_in users(:system_admin)
+    visit new_template_url
+
+    # Verify import section is visible
+    assert_text "Import Template"
+    assert_text "Upload a Concerto 1/2 template ZIP file"
+    assert_selector "label[for='zip-upload']", text: "Choose ZIP File"
+
+    # Note: Full import test with file upload is tested manually
+    # System tests with file inputs and async JavaScript are tricky
+  end
+
   test "should update Template" do
     sign_in users(:system_admin)
     visit template_url(@template)
