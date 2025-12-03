@@ -210,13 +210,9 @@ export default class extends Controller {
     // Calculate pixel position
     this.updatePositionElement(rect, position)
 
-    // Add label
+    // Add label (positioning will be handled by updateLabelPosition via updatePositionElement)
     const label = document.createElement('div')
     label.className = 'position-label'
-    // Position label below if position is near top of canvas
-    if (position.top < 0.08) {
-      label.classList.add('label-below')
-    }
     label.textContent = position.field_name || `Position ${position.id}`
     rect.appendChild(label)
 
@@ -258,16 +254,25 @@ export default class extends Controller {
     this.updateLabelPosition(element, position)
   }
 
-  // Update label position (flip to bottom if near top of canvas)
+  // Update label position (flip to bottom if near top, inside if very tall)
   updateLabelPosition(element, position) {
     const label = element.querySelector('.position-label')
     if (!label) return
 
-    if (position.top < 0.08) {
-      label.classList.add('label-below')
-    } else {
-      label.classList.remove('label-below')
+    const height = position.bottom - position.top
+
+    // Remove all positioning classes first
+    label.classList.remove('label-below', 'label-inside')
+
+    // If position takes up most of the canvas height, put label inside
+    if (height > 0.85) {
+      label.classList.add('label-inside')
     }
+    // If position is near top of canvas, put label below
+    else if (position.top < 0.08) {
+      label.classList.add('label-below')
+    }
+    // Otherwise label stays above (default)
   }
 
   // Start dragging

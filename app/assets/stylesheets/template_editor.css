@@ -43,6 +43,12 @@
   bottom: -26px;
 }
 
+.position-label.label-inside {
+  top: 4px;
+  left: 4px;
+  background: rgba(0, 123, 255, 0.9);
+}
+
 .position-rectangle.selected .position-label {
   background: #0056B3;
 }
