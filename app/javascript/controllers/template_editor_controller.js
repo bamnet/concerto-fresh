@@ -14,7 +14,8 @@ export default class extends Controller {
     "coordTop",
     "coordRight",
     "coordBottom",
-    "imageInput"
+    "imageInput",
+    "addPositionButton"
   ]
 
   static values = {
@@ -23,9 +24,8 @@ export default class extends Controller {
 
   connect() {
     this.positions = this.positionsValue || []
-    this.nextId = this.positions.length > 0
-      ? Math.max(...this.positions.map(p => parseInt(p.id.replace('pos_', '')))) + 1
-      : 1
+    const maxId = Math.max(0, ...this.positions.map(p => parseInt(p.id.replace('pos_', ''), 10) || 0))
+    this.nextId = maxId + 1
     this.selectedPosition = null
     this.dragging = null
     this.resizing = null
@@ -39,6 +39,12 @@ export default class extends Controller {
     // Add global listeners
     document.addEventListener('mousemove', this.boundMouseMove)
     document.addEventListener('mouseup', this.boundMouseUp)
+
+    // Disable Add Position button if no image is attached
+    if (this.hasAddPositionButtonTarget) {
+      const hasImage = this.imageTarget.style.display !== 'none' && this.imageTarget.src
+      this.addPositionButtonTarget.disabled = !hasImage
+    }
 
     // Render existing positions if any
     if (this.positions.length > 0) {
@@ -70,6 +76,11 @@ export default class extends Controller {
           this.placeholderTarget.style.display = 'none'
         }
 
+        // Enable Add Position button now that image is loaded
+        if (this.hasAddPositionButtonTarget) {
+          this.addPositionButtonTarget.disabled = false
+        }
+
         // Re-render all positions with new image dimensions
         this.clearCanvas()
         this.positions.forEach(pos => this.renderPosition(pos))
@@ -81,6 +92,12 @@ export default class extends Controller {
 
   // Add new position
   addPosition() {
+    // Validate that fields exist before adding position
+    if (!this.hasFieldSelectTarget || this.fieldSelectTarget.options.length === 0) {
+      alert('Cannot add position: No fields available. Please create fields first.')
+      return
+    }
+
     // Create new position in center, 200x150px default
     const scale = this.getScale()
 
@@ -236,6 +253,21 @@ export default class extends Controller {
     element.style.top = `${top}px`
     element.style.width = `${width}px`
     element.style.height = `${height}px`
+
+    // Update label position based on position's top coordinate
+    this.updateLabelPosition(element, position)
+  }
+
+  // Update label position (flip to bottom if near top of canvas)
+  updateLabelPosition(element, position) {
+    const label = element.querySelector('.position-label')
+    if (!label) return
+
+    if (position.top < 0.08) {
+      label.classList.add('label-below')
+    } else {
+      label.classList.remove('label-below')
+    }
   }
 
   // Start dragging
@@ -255,7 +287,8 @@ export default class extends Controller {
       startLeft: position.left,
       startTop: position.top,
       width: position.right - position.left,
-      height: position.bottom - position.top
+      height: position.bottom - position.top,
+      scale: this.getScale()
     }
   }
 
@@ -277,7 +310,8 @@ export default class extends Controller {
       startLeft: position.left,
       startTop: position.top,
       startRight: position.right,
-      startBottom: position.bottom
+      startBottom: position.bottom,
+      scale: this.getScale()
     }
   }
 
@@ -297,7 +331,7 @@ export default class extends Controller {
     const position = this.positions.find(p => p.id === this.dragging.id)
     if (!position) return
 
-    const scale = this.getScale()
+    const scale = this.dragging.scale
     const deltaX = (event.clientX - this.dragging.startX) / (this.imageWidth * scale)
     const deltaY = (event.clientY - this.dragging.startY) / (this.imageHeight * scale)
 
@@ -325,7 +359,7 @@ export default class extends Controller {
     const position = this.positions.find(p => p.id === this.resizing.id)
     if (!position) return
 
-    const scale = this.getScale()
+    const scale = this.resizing.scale
     const deltaX = (event.clientX - this.resizing.startX) / (this.imageWidth * scale)
     const deltaY = (event.clientY - this.resizing.startY) / (this.imageHeight * scale)
 
@@ -381,17 +415,23 @@ export default class extends Controller {
         item.classList.add('selected')
       }
 
-      item.innerHTML = `
-        <div class="flex items-center justify-between p-2 border rounded cursor-pointer hover:bg-gray-50">
-          <div>
-            <div class="font-medium">${position.field_name || 'Unnamed'}</div>
-            <div class="text-xs text-gray-500">
-              ${position.left.toFixed(3)}, ${position.top.toFixed(3)} →
-              ${position.right.toFixed(3)}, ${position.bottom.toFixed(3)}
-            </div>
-          </div>
-        </div>
-      `
+      const container = document.createElement('div')
+      container.className = 'flex items-center justify-between p-2 border rounded cursor-pointer hover:bg-gray-50'
+
+      const content = document.createElement('div')
+
+      const fieldName = document.createElement('div')
+      fieldName.className = 'font-medium'
+      fieldName.textContent = position.field_name || 'Unnamed'
+
+      const coords = document.createElement('div')
+      coords.className = 'text-xs text-gray-500'
+      coords.textContent = `${position.left.toFixed(3)}, ${position.top.toFixed(3)} → ${position.right.toFixed(3)}, ${position.bottom.toFixed(3)}`
+
+      content.appendChild(fieldName)
+      content.appendChild(coords)
+      container.appendChild(content)
+      item.appendChild(container)
 
       item.addEventListener('click', () => this.selectPosition(position.id))
       list.appendChild(item)
@@ -412,8 +452,8 @@ export default class extends Controller {
     return Math.min(scaleX, scaleY)
   }
 
-  // Get default field ID - prefers unused fields
-  getDefaultFieldId() {
+  // Get default field option - prefers unused fields
+  getDefaultFieldOption() {
     if (!this.hasFieldSelectTarget || this.fieldSelectTarget.options.length === 0) {
       return null
     }
@@ -427,35 +467,24 @@ export default class extends Controller {
     for (let i = 0; i < this.fieldSelectTarget.options.length; i++) {
       const option = this.fieldSelectTarget.options[i]
       if (!usedFieldIds.includes(option.value)) {
-        return option.value
+        return option
       }
     }
 
     // If all fields are used, return the first one
-    return this.fieldSelectTarget.options[0].value
+    return this.fieldSelectTarget.options[0]
+  }
+
+  // Get default field ID - prefers unused fields
+  getDefaultFieldId() {
+    const option = this.getDefaultFieldOption()
+    return option ? option.value : null
   }
 
   // Get default field name - matches the default field ID
   getDefaultFieldName() {
-    if (!this.hasFieldSelectTarget || this.fieldSelectTarget.options.length === 0) {
-      return 'Unnamed'
-    }
-
-    // Get all field IDs currently in use (excluding destroyed positions)
-    const usedFieldIds = this.positions
-      .filter(p => !p._destroy)
-      .map(p => p.field_id?.toString())
-
-    // Find first unused field
-    for (let i = 0; i < this.fieldSelectTarget.options.length; i++) {
-      const option = this.fieldSelectTarget.options[i]
-      if (!usedFieldIds.includes(option.value)) {
-        return option.text
-      }
-    }
-
-    // If all fields are used, return the first one
-    return this.fieldSelectTarget.options[0].text
+    const option = this.getDefaultFieldOption()
+    return option ? option.text : 'Unnamed'
   }
 
   // Update hidden form fields before submission

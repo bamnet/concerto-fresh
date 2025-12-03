@@ -19,6 +19,9 @@ class TemplatesTest < ApplicationSystemTestCase
     fill_in "Author", with: @template.author
     fill_in "Name", with: @template.name
 
+    # Upload an image first (required before adding positions)
+    attach_file "template[image]", Rails.root.join("test/fixtures/files/template.jpg")
+
     # Add positions using WYSIWYG editor
     @template.positions.each_with_index do |position, index|
       click_on "+ Add Position"

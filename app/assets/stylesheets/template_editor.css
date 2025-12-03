@@ -94,9 +94,9 @@
   transition: all 0.2s;
 }
 
-.position-list-item.selected {
-  background-color: #CCE5FF !important;
-  border-color: #007BFF !important;
+.position-list-item.selected > div {
+  background-color: #CCE5FF;
+  border-color: #007BFF;
 }
 
 .position-list-item:hover {
