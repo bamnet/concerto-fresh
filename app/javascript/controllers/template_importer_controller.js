@@ -110,22 +110,60 @@ export default class extends Controller {
       throw new Error('No <template> element found in XML')
     }
 
-    // Extract template metadata
-    const name = templateEl.getAttribute('name') || 'Imported Template'
-    const author = templateEl.getAttribute('author') || ''
+    // Extract template metadata from child elements or attributes
+    const nameEl = templateEl.querySelector('name')
+    const authorEl = templateEl.querySelector('author')
+    const name = nameEl ? nameEl.textContent : (templateEl.getAttribute('name') || 'Imported Template')
+    const author = authorEl ? authorEl.textContent : (templateEl.getAttribute('author') || '')
 
-    // Extract positions
-    const positionEls = doc.querySelectorAll('position')
-    const positions = Array.from(positionEls).map((pos, index) => ({
-      id: `pos_${index + 1}`,
-      field_name: pos.getAttribute('name') || 'Unnamed',
-      left: parseFloat(pos.getAttribute('left') || 0),
-      top: parseFloat(pos.getAttribute('top') || 0),
-      right: parseFloat(pos.getAttribute('right') || 1),
-      bottom: parseFloat(pos.getAttribute('bottom') || 1),
-      style: pos.getAttribute('style') || '',
-      _destroy: false
-    }))
+    // Extract field/position elements
+    const fieldEls = doc.querySelectorAll('field, position')
+    const positions = Array.from(fieldEls).map((field, index) => {
+      // Get field name from child element or attribute
+      const nameEl = field.querySelector('name')
+      const field_name = nameEl ? nameEl.textContent : (field.getAttribute('name') || 'Unnamed')
+
+      // Get coordinates from child elements or attributes
+      const leftEl = field.querySelector('left')
+      const topEl = field.querySelector('top')
+      const widthEl = field.querySelector('width')
+      const heightEl = field.querySelector('height')
+      const rightEl = field.querySelector('right')
+      const bottomEl = field.querySelector('bottom')
+      const styleEl = field.querySelector('style')
+
+      const left = parseFloat(leftEl ? leftEl.textContent : (field.getAttribute('left') || 0))
+      const top = parseFloat(topEl ? topEl.textContent : (field.getAttribute('top') || 0))
+
+      // Handle both width/height and right/bottom formats
+      let right, bottom
+      if (widthEl || field.hasAttribute('width')) {
+        const width = parseFloat(widthEl ? widthEl.textContent : field.getAttribute('width'))
+        right = left + width
+      } else {
+        right = parseFloat(rightEl ? rightEl.textContent : (field.getAttribute('right') || 1))
+      }
+
+      if (heightEl || field.hasAttribute('height')) {
+        const height = parseFloat(heightEl ? heightEl.textContent : field.getAttribute('height'))
+        bottom = top + height
+      } else {
+        bottom = parseFloat(bottomEl ? bottomEl.textContent : (field.getAttribute('bottom') || 1))
+      }
+
+      const style = styleEl ? styleEl.textContent : (field.getAttribute('style') || '')
+
+      return {
+        id: `pos_${index + 1}`,
+        field_name: field_name,
+        left: left,
+        top: top,
+        right: right,
+        bottom: bottom,
+        style: style,
+        _destroy: false
+      }
+    })
 
     return { name, author, positions }
   }
