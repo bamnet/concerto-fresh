@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import * as JSZip from 'jszip';
+import 'jszip'; // Loads JSZip into window.JSZip
 
 // Connects to data-controller="template-importer"
 export default class extends Controller {
@@ -22,7 +22,7 @@ export default class extends Controller {
 
     try {
       // Load ZIP
-      const zip = await JSZip.loadAsync(file)
+      const zip = await window.JSZip.loadAsync(file)
 
       // Extract and parse XML
       const xmlFile = await this.findXmlFile(zip)
