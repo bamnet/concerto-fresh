@@ -111,47 +111,32 @@ export default class extends Controller {
     }
 
     // Extract template metadata from child elements or attributes
-    const nameEl = templateEl.querySelector('name')
-    const authorEl = templateEl.querySelector('author')
-    const name = nameEl ? nameEl.textContent : (templateEl.getAttribute('name') || 'Imported Template')
-    const author = authorEl ? authorEl.textContent : (templateEl.getAttribute('author') || '')
+    const name = this._getNodeValue(templateEl, 'name', 'name', 'Imported Template')
+    const author = this._getNodeValue(templateEl, 'author', 'author', '')
 
     // Extract field/position elements
     const fieldEls = doc.querySelectorAll('field, position')
     const positions = Array.from(fieldEls).map((field, index) => {
-      // Get field name from child element or attribute
-      const nameEl = field.querySelector('name')
-      const field_name = nameEl ? nameEl.textContent : (field.getAttribute('name') || 'Unnamed')
-
-      // Get coordinates from child elements or attributes
-      const leftEl = field.querySelector('left')
-      const topEl = field.querySelector('top')
-      const widthEl = field.querySelector('width')
-      const heightEl = field.querySelector('height')
-      const rightEl = field.querySelector('right')
-      const bottomEl = field.querySelector('bottom')
-      const styleEl = field.querySelector('style')
-
-      const left = parseFloat(leftEl ? leftEl.textContent : (field.getAttribute('left') || 0))
-      const top = parseFloat(topEl ? topEl.textContent : (field.getAttribute('top') || 0))
+      const field_name = this._getNodeValue(field, 'name', 'name', 'Unnamed')
+      const left = parseFloat(this._getNodeValue(field, 'left', 'left', 0))
+      const top = parseFloat(this._getNodeValue(field, 'top', 'top', 0))
+      const style = this._getNodeValue(field, 'style', 'style', '')
 
       // Handle both width/height and right/bottom formats
       let right, bottom
-      if (widthEl || field.hasAttribute('width')) {
-        const width = parseFloat(widthEl ? widthEl.textContent : field.getAttribute('width'))
-        right = left + width
+      const widthValue = this._getNodeValue(field, 'width', 'width', null)
+      if (widthValue !== null) {
+        right = left + parseFloat(widthValue)
       } else {
-        right = parseFloat(rightEl ? rightEl.textContent : (field.getAttribute('right') || 1))
+        right = parseFloat(this._getNodeValue(field, 'right', 'right', 1))
       }
 
-      if (heightEl || field.hasAttribute('height')) {
-        const height = parseFloat(heightEl ? heightEl.textContent : field.getAttribute('height'))
-        bottom = top + height
+      const heightValue = this._getNodeValue(field, 'height', 'height', null)
+      if (heightValue !== null) {
+        bottom = top + parseFloat(heightValue)
       } else {
-        bottom = parseFloat(bottomEl ? bottomEl.textContent : (field.getAttribute('bottom') || 1))
+        bottom = parseFloat(this._getNodeValue(field, 'bottom', 'bottom', 1))
       }
-
-      const style = styleEl ? styleEl.textContent : (field.getAttribute('style') || '')
 
       return {
         id: `pos_${index + 1}`,
@@ -166,6 +151,13 @@ export default class extends Controller {
     })
 
     return { name, author, positions }
+  }
+
+  _getNodeValue(element, query, attribute, defaultValue) {
+    const childEl = element.querySelector(query)
+    if (childEl) return childEl.textContent
+    if (element.hasAttribute(attribute)) return element.getAttribute(attribute)
+    return defaultValue
   }
 
   setLoading(isLoading) {

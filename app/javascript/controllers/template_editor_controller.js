@@ -630,41 +630,29 @@ export default class extends Controller {
   findFieldIdByName(name) {
     if (!this.hasFieldSelectTarget) return null
 
-    // Try exact match on field name first
-    for (let option of this.fieldSelectTarget.options) {
-      if (option.text.toLowerCase() === name.toLowerCase()) {
-        return option.value
-      }
-    }
+    const lowerCaseName = name.toLowerCase()
+    const optionsWithData = Array.from(this.fieldSelectTarget.options).map(option => ({
+      value: option.value,
+      lowerCaseText: option.text.toLowerCase(),
+      lowerCaseAltNames: this.getAltNames(option).map(alt => alt.toLowerCase())
+    }))
 
-    // Try exact match on alt_names
-    for (let option of this.fieldSelectTarget.options) {
-      const altNames = this.getAltNames(option)
-      if (altNames.some(alt => alt.toLowerCase() === name.toLowerCase())) {
-        return option.value
-      }
-    }
+    // Priority 1: Exact match on field name
+    let match = optionsWithData.find(o => o.lowerCaseText === lowerCaseName)
+    if (match) return match.value
 
-    // Try partial match on field name
-    for (let option of this.fieldSelectTarget.options) {
-      if (option.text.toLowerCase().includes(name.toLowerCase()) ||
-          name.toLowerCase().includes(option.text.toLowerCase())) {
-        return option.value
-      }
-    }
+    // Priority 2: Exact match on alt_names
+    match = optionsWithData.find(o => o.lowerCaseAltNames.includes(lowerCaseName))
+    if (match) return match.value
 
-    // Try partial match on alt_names
-    for (let option of this.fieldSelectTarget.options) {
-      const altNames = this.getAltNames(option)
-      if (altNames.some(alt =>
-        alt.toLowerCase().includes(name.toLowerCase()) ||
-        name.toLowerCase().includes(alt.toLowerCase())
-      )) {
-        return option.value
-      }
-    }
+    // Priority 3: Partial match on field name
+    match = optionsWithData.find(o => o.lowerCaseText.includes(lowerCaseName) || lowerCaseName.includes(o.lowerCaseText))
+    if (match) return match.value
 
-    // No match found
+    // Priority 4: Partial match on alt_names
+    match = optionsWithData.find(o => o.lowerCaseAltNames.some(alt => alt.includes(lowerCaseName) || lowerCaseName.includes(alt)))
+    if (match) return match.value
+
     return null
   }
 
