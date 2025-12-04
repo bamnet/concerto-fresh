@@ -1,4 +1,0 @@
-// readable-stream@2.3.8 downloaded from https://ga.jspm.io/npm:readable-stream@2.3.8/readable-browser.js
-
-import{d as r,a,b as s}from"./_/3f5a25d6.js";import{d as e}from"./_/d41092bd.js";import{d as t}from"./_/242fa41a.js";import"process-nextick-args";import"isarray";import"events";import"#lib/internal/streams/stream.js";import"safe-buffer";import"core-util-is";import"inherits";import"util";import"string_decoder";import"process";import"util-deprecate";var i={},o=false;function dew(){if(o)return i;o=true;i=i=r();i.Stream=i;i.Readable=i;i.Writable=a();i.Duplex=s();i.Transform=e();i.PassThrough=t();return i}const m=dew();var p=m.Stream,l=m.Readable,d=m.Writable,f=m.Duplex,u=m.Transform,n=m.PassThrough;export{f as Duplex,n as PassThrough,l as Readable,p as Stream,u as Transform,d as Writable,m as default};
-
