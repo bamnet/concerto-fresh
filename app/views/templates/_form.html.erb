@@ -157,7 +157,7 @@
             data-action="change->template-editor#updateField"
             class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <% Field.all.each do |field| %>
-              <option value="<%= field.id %>"><%= field.name %></option>
+              <option value="<%= field.id %>" data-alt-names="<%= field.alt_names.to_json %>"><%= field.name %></option>
             <% end %>
           </select>
         </div>

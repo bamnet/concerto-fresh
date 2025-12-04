@@ -630,14 +630,22 @@ export default class extends Controller {
   findFieldIdByName(name) {
     if (!this.hasFieldSelectTarget) return null
 
-    // Try exact match first
+    // Try exact match on field name first
     for (let option of this.fieldSelectTarget.options) {
       if (option.text.toLowerCase() === name.toLowerCase()) {
         return option.value
       }
     }
 
-    // Try partial match
+    // Try exact match on alt_names
+    for (let option of this.fieldSelectTarget.options) {
+      const altNames = this.getAltNames(option)
+      if (altNames.some(alt => alt.toLowerCase() === name.toLowerCase())) {
+        return option.value
+      }
+    }
+
+    // Try partial match on field name
     for (let option of this.fieldSelectTarget.options) {
       if (option.text.toLowerCase().includes(name.toLowerCase()) ||
           name.toLowerCase().includes(option.text.toLowerCase())) {
@@ -645,8 +653,30 @@ export default class extends Controller {
       }
     }
 
+    // Try partial match on alt_names
+    for (let option of this.fieldSelectTarget.options) {
+      const altNames = this.getAltNames(option)
+      if (altNames.some(alt =>
+        alt.toLowerCase().includes(name.toLowerCase()) ||
+        name.toLowerCase().includes(alt.toLowerCase())
+      )) {
+        return option.value
+      }
+    }
+
     // No match found
     return null
+  }
+
+  getAltNames(option) {
+    try {
+      const altNamesAttr = option.dataset.altNames
+      if (!altNamesAttr) return []
+      const parsed = JSON.parse(altNamesAttr)
+      return Array.isArray(parsed) ? parsed : []
+    } catch (e) {
+      return []
+    }
   }
 
   getFieldNameById(fieldId) {
