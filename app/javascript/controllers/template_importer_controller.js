@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import JSZip from "jszip"
+import * as JSZip from 'jszip';
 
 // Connects to data-controller="template-importer"
 export default class extends Controller {
