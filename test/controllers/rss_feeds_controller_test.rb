@@ -82,13 +82,32 @@ class RssFeedsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Updated by system admin", @rss_feed.name
   end
 
-  test "should not allow non-system-admin to update rss_feed" do
-    sign_in users(:admin)  # even group admin can't update (limitation until #511)
-    patch rss_feed_url(@rss_feed), params: { rss_feed: { name: "Unauthorized update" } }
+  test "should allow group admin to update rss_feed" do
+    test_feed = rss_feeds(:test_rssfeed)  # belongs to feed_one_owners
+    sign_in users(:admin)  # admin is admin of feed_one_owners
+    patch rss_feed_url(test_feed), params: { rss_feed: { name: "Updated by group admin" } }
+    assert_redirected_to rss_feed_url(test_feed)
+    test_feed.reload
+    assert_equal "Updated by group admin", test_feed.name
+  end
+
+  test "should allow group member to update rss_feed" do
+    test_feed = rss_feeds(:test_rssfeed)  # belongs to feed_one_owners
+    sign_in users(:regular)  # regular is member of feed_one_owners
+    patch rss_feed_url(test_feed), params: { rss_feed: { name: "Updated by group member" } }
+    assert_redirected_to rss_feed_url(test_feed)
+    test_feed.reload
+    assert_equal "Updated by group member", test_feed.name
+  end
+
+  test "should not allow non-group member to update rss_feed" do
+    test_feed = rss_feeds(:test_rssfeed)  # belongs to feed_one_owners
+    sign_in users(:non_member)  # non_member is not in feed_one_owners
+    patch rss_feed_url(test_feed), params: { rss_feed: { name: "Unauthorized update" } }
     assert_redirected_to root_url
     assert_equal "You are not authorized to perform this action.", flash[:alert]
-    @rss_feed.reload
-    assert_not_equal "Unauthorized update", @rss_feed.name
+    test_feed.reload
+    assert_not_equal "Unauthorized update", test_feed.name
   end
 
   test "should allow system admin to destroy rss_feed" do
@@ -99,10 +118,30 @@ class RssFeedsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to feeds_url
   end
 
-  test "should not allow non-system-admin to destroy rss_feed" do
-    sign_in users(:admin)  # even group admin can't destroy (limitation until #511)
+  test "should allow group admin to destroy rss_feed" do
+    test_feed = rss_feeds(:test_rssfeed)  # belongs to feed_one_owners
+    sign_in users(:admin)  # admin is admin of feed_one_owners
+    assert_difference("RssFeed.count", -1) do
+      delete rss_feed_url(test_feed)
+    end
+    assert_redirected_to feeds_url
+  end
+
+  test "should not allow group member to destroy rss_feed" do
+    test_feed = rss_feeds(:test_rssfeed)  # belongs to feed_one_owners
+    sign_in users(:regular)  # regular is only a member, not admin
     assert_no_difference("RssFeed.count") do
-      delete rss_feed_url(@rss_feed)
+      delete rss_feed_url(test_feed)
+    end
+    assert_redirected_to root_url
+    assert_equal "You are not authorized to perform this action.", flash[:alert]
+  end
+
+  test "should not allow non-group member to destroy rss_feed" do
+    test_feed = rss_feeds(:test_rssfeed)  # belongs to feed_one_owners
+    sign_in users(:non_member)  # non_member is not in feed_one_owners
+    assert_no_difference("RssFeed.count") do
+      delete rss_feed_url(test_feed)
     end
     assert_redirected_to root_url
     assert_equal "You are not authorized to perform this action.", flash[:alert]
@@ -118,9 +157,21 @@ class RssFeedsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to rss_feed_url(@rss_feed)
   end
 
-  test "should not allow non-system-admin to refresh rss_feed" do
-    sign_in users(:admin)  # even group admin can't refresh (limitation until #511)
-    get refresh_rss_feed_url(@rss_feed)
+  test "should allow group member to refresh rss_feed" do
+    test_feed = rss_feeds(:test_rssfeed)  # belongs to feed_one_owners
+    sign_in users(:regular)  # regular is member of feed_one_owners
+    # Just test that authorized user can access the action
+    # The actual refresh behavior is tested in model tests
+    assert_nothing_raised do
+      get refresh_rss_feed_url(test_feed)
+    end
+    assert_redirected_to rss_feed_url(test_feed)
+  end
+
+  test "should not allow non-group member to refresh rss_feed" do
+    test_feed = rss_feeds(:test_rssfeed)  # belongs to feed_one_owners
+    sign_in users(:non_member)  # non_member is not in feed_one_owners
+    get refresh_rss_feed_url(test_feed)
     assert_redirected_to root_url
     assert_equal "You are not authorized to perform this action.", flash[:alert]
   end
@@ -133,9 +184,17 @@ class RssFeedsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to rss_feed_url(@rss_feed)
   end
 
-  test "should not allow non-system-admin to cleanup rss_feed" do
-    sign_in users(:admin)  # even group admin can't cleanup (limitation until #511)
-    delete cleanup_rss_feed_url(@rss_feed)
+  test "should allow group member to cleanup rss_feed" do
+    test_feed = rss_feeds(:test_rssfeed)  # belongs to feed_one_owners
+    sign_in users(:regular)  # regular is member of feed_one_owners
+    delete cleanup_rss_feed_url(test_feed)
+    assert_redirected_to rss_feed_url(test_feed)
+  end
+
+  test "should not allow non-group member to cleanup rss_feed" do
+    test_feed = rss_feeds(:test_rssfeed)  # belongs to feed_one_owners
+    sign_in users(:non_member)  # non_member is not in feed_one_owners
+    delete cleanup_rss_feed_url(test_feed)
     assert_redirected_to root_url
     assert_equal "You are not authorized to perform this action.", flash[:alert]
   end
