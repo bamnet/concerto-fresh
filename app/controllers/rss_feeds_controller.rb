@@ -82,13 +82,17 @@ class RssFeedsController < ApplicationController
 
     # Sets options for form selects.
     def set_form_options
-      # In an edit context, ensure the screen's current group is in the list for display,
-      # even if the user is not an admin of it. They won't be able to *switch* to it,
-      # but they should be able to see it.
-      @groups = if @feed&.persisted?
-        (current_user.admin_groups + [ @feed.group ]).compact.uniq
+      if current_user.system_admin?
+        @groups = Group.all
       else
-        current_user.admin_groups
+        # In an edit context, ensure the feeds's current group is in the list for display,
+        # even if the user is not an admin of it. They won't be able to *switch* to it,
+        # but they should be able to see it.
+        @groups = if @rss_feed&.persisted?
+          (current_user.admin_groups + [ @rss_feed.group ]).compact.uniq
+        else
+          current_user.admin_groups
+        end
       end
     end
 

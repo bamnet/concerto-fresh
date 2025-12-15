@@ -81,7 +81,7 @@ class FeedsController < ApplicationController
       if current_user.system_admin?
         @groups = Group.all
       else
-        # In an edit context, ensure the screen's current group is in the list for display,
+        # In an edit context, ensure the feed's current group is in the list for display,
         # even if the user is not an admin of it. They won't be able to *switch* to it,
         # but they should be able to see it.
         @groups = if @feed&.persisted?
