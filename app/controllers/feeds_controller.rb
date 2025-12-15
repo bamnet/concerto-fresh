@@ -45,10 +45,12 @@ class FeedsController < ApplicationController
 
   # PATCH/PUT /feeds/1 or /feeds/1.json
   def update
+    @feed.assign_attributes(feed_params)
+
     authorize @feed
 
     respond_to do |format|
-      if @feed.update(feed_params)
+      if @feed.save
         format.html { redirect_to feed_url(@feed), notice: "Feed was successfully updated." }
         format.json { render :show, status: :ok, location: @feed }
       else

@@ -29,7 +29,6 @@ class RssFeedsController < ApplicationController
     respond_to do |format|
       if @rss_feed.save
         format.html { redirect_to rss_feed_url(@rss_feed), notice: "RSS Feed was successfully created." }
-        format.html { redirect_to rss_feed_url(@rss_feed), notice: "RSS Feed was successfully created." }
         format.json { render :show, status: :created, location: @rss_feed }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -89,7 +88,7 @@ class RssFeedsController < ApplicationController
       if current_user.system_admin?
         @groups = Group.all
       else
-        # In an edit context, ensure the feeds's current group is in the list for display,
+        # In an edit context, ensure the feed's current group is in the list for display,
         # even if the user is not an admin of it. They won't be able to *switch* to it,
         # but they should be able to see it.
         @groups = if @rss_feed&.persisted?
