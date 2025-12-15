@@ -23,6 +23,7 @@ class RssFeedsController < ApplicationController
   # POST /rss_feeds or /rss_feeds.json
   def create
     @rss_feed = RssFeed.new(rss_feed_params)
+
     authorize @rss_feed
 
     respond_to do |format|
@@ -39,9 +40,12 @@ class RssFeedsController < ApplicationController
 
   # PATCH/PUT /rss_feeds/1 or /rss_feeds/1.json
   def update
+    @rss_feed.assign_attributes(rss_feed_params)
+
     authorize @rss_feed
+
     respond_to do |format|
-      if @rss_feed.update(rss_feed_params)
+      if @rss_feed.save
         format.html { redirect_to rss_feed_url(@rss_feed), notice: "RSS Feed was successfully updated." }
         format.json { render :show, status: :ok, location: @rss_feed }
       else

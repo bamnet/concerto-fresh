@@ -43,12 +43,16 @@ class FeedPolicyTest < ActiveSupport::TestCase
     assert FeedPolicy.new(@system_admin_user, @feed).create?
   end
 
-  test "create? is permitted for user who is an admin of any group" do
-    assert FeedPolicy.new(@group_admin_user, Feed.new).create?
+  test "create? is permitted for a group admin" do
+    assert FeedPolicy.new(@group_admin_user, @feed).create?
   end
 
-  test "create? is denied for user who is not an admin of any group" do
-    refute FeedPolicy.new(@group_regular_user, Feed.new).create?
+  test "create? is denied for a regular group member" do
+    refute FeedPolicy.new(@group_regular_user, @feed).create?
+  end
+
+  test "create? is denied for a non-group member" do
+    refute FeedPolicy.new(@non_group_user, @feed).create?
   end
 
   # Edit permissions

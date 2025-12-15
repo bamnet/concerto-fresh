@@ -22,7 +22,7 @@ class FeedPolicy < ApplicationPolicy
 
   def create?
     # Once Feed has group_id, this will check group admin permissions
-    super || can_create_new_feed?
+    super || can_create_feed?
   end
 
   def edit?
@@ -59,8 +59,10 @@ class FeedPolicy < ApplicationPolicy
   end
 
   # Feeds can be created by any admin of the associated group.
+  # If no group is assigned yet, fallback to checking if user is admin of any group.
   def can_create_feed?
     return false unless user
+    return can_create_new_feed? unless record.group
     record.group.admin?(user)
   end
 

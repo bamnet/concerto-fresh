@@ -16,7 +16,7 @@ class RssFeedsControllerTest < ActionDispatch::IntegrationTest
     sign_in users(:admin)  # group admin
     assert_difference("RssFeed.count") do
       post rss_feeds_url, params: { rss_feed: { description: @rss_feed.description, name: @rss_feed.name, url: @rss_feed.url,
-        formatter: @rss_feed.formatter, group_id: @rss_feed.group_id } }
+        formatter: @rss_feed.formatter, group_id: groups(:feed_one_owners).id } }
     end
 
     assert_redirected_to rss_feed_url(RssFeed.last)
