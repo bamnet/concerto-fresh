@@ -63,6 +63,19 @@ class FeedPolicy < ApplicationPolicy
   def permitted_attributes
     # System admins can edit all attributes
     # Once Feed has group_id, non-admins will have restricted permissions
-    [ :name, :description, :type, :config, :group_id ]
+    if can_edit_group?
+      [ :name, :description, :type, :config, :group_id ]
+    else
+      [ :name, :description, :type, :config ]
+    end
+  end
+
+  # Helper method to determine if the user can edit the group which owns a screen.
+  #
+  # This is used both in the policy and in the view to disable UI elements.
+  def can_edit_group?
+    return true if user&.system_admin?
+    return false unless user
+    record.new_record? || record.group.admin?(user)
   end
 end

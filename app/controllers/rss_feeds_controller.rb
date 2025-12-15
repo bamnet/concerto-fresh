@@ -1,5 +1,7 @@
 class RssFeedsController < ApplicationController
   before_action :set_rss_feed, only: %i[ show edit update destroy refresh cleanup ]
+  before_action :set_form_options, only: %i[ new edit create update ]
+
   after_action :verify_authorized
 
   # GET /rss_feeds/1 or /rss_feeds/1.json
@@ -76,6 +78,18 @@ class RssFeedsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_rss_feed
       @rss_feed = RssFeed.find(params[:id])
+    end
+
+    # Sets options for form selects.
+    def set_form_options
+      # In an edit context, ensure the screen's current group is in the list for display,
+      # even if the user is not an admin of it. They won't be able to *switch* to it,
+      # but they should be able to see it.
+      @groups = if @feed&.persisted?
+        (current_user.admin_groups + [ @feed.group ]).compact.uniq
+      else
+        current_user.admin_groups
+      end
     end
 
     # Only allow a list of trusted parameters through.

@@ -30,6 +30,13 @@
           </dd>
         </div>
 
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <dt class="text-body font-medium text-neutral-700">Managers</dt>
+          <dd class="text-body text-neutral-900 sm:col-span-2">
+            <%= link_to @rss_feed.group.name, @rss_feed.group %>
+          </dd>
+        </div>
+
         <!-- RSS URL -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <dt class="text-body font-medium text-neutral-700">RSS Feed URL</dt>

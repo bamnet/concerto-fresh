@@ -7,6 +7,7 @@
       <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         <div>
           <h1 class="text-h2 text-neutral-900"><%= @feed.name %></h1>
+          <p>Managed by: <%= link_to @feed.group.name, @feed.group %></p>
           <% if @feed.description.present? %>
             <p class="text-body text-neutral-700 mt-1"><%= @feed.description %></p>
           <% end %>

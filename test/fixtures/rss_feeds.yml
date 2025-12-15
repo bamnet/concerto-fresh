@@ -5,9 +5,11 @@ yahoo_rssfeed:
   name: Yahoo News RSS
   description: MyText
   config: {'url': 'https://news.yahoo.com/rss/us', 'formatter': 'headlines'}
+  group: system_administrators
 
 nytimes_rssfeed:
   type: RssFeed
   name: NYTimes RSS
   description: MyText
   config: {'url': 'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml', 'formatter': 'details'}
+  group: system_administrators

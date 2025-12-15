@@ -16,7 +16,7 @@ class RssFeedsControllerTest < ActionDispatch::IntegrationTest
     sign_in users(:admin)  # group admin
     assert_difference("RssFeed.count") do
       post rss_feeds_url, params: { rss_feed: { description: @rss_feed.description, name: @rss_feed.name, url: @rss_feed.url,
-        formatter: @rss_feed.formatter } }
+        formatter: @rss_feed.formatter, group_id: @rss_feed.group_id } }
     end
 
     assert_redirected_to rss_feed_url(RssFeed.last)
@@ -59,7 +59,8 @@ class RssFeedsControllerTest < ActionDispatch::IntegrationTest
   test "should allow group admin to create rss_feed" do
     sign_in users(:admin)  # admin is a group admin
     assert_difference("RssFeed.count") do
-      post rss_feeds_url, params: { rss_feed: { description: "RSS Test Feed", name: "Test RSS Feed", url: "https://example.com/rss", formatter: "headlines" } }
+      post rss_feeds_url, params: { rss_feed: { description: "RSS Test Feed", name: "Test RSS Feed", url: "https://example.com/rss", formatter: "headlines",
+        group_id: groups(:moderators).id } }
     end
     assert_redirected_to rss_feed_url(RssFeed.last)
   end

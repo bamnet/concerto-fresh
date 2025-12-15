@@ -20,7 +20,7 @@ class FeedsControllerTest < ActionDispatch::IntegrationTest
   test "should create feed with system admin" do
     sign_in @system_admin
     assert_difference("Feed.count") do
-      post feeds_url, params: { feed: { description: @feed.description, name: @feed.name } }
+      post feeds_url, params: { feed: { description: @feed.description, name: @feed.name, group_id: @feed.group_id } }
     end
 
     assert_redirected_to feed_url(Feed.last)
@@ -39,7 +39,7 @@ class FeedsControllerTest < ActionDispatch::IntegrationTest
 
   test "should update feed with system admin" do
     sign_in @system_admin
-    patch feed_url(@feed), params: { feed: { description: @feed.description, name: @feed.name } }
+    patch feed_url(@feed), params: { feed: { description: @feed.description, name: @feed.name, group_id: @feed.group_id } }
     assert_redirected_to feed_url(@feed)
   end
 
@@ -56,7 +56,7 @@ class FeedsControllerTest < ActionDispatch::IntegrationTest
   test "should allow group admin to create feed" do
     sign_in users(:admin)  # admin is a group admin
     assert_difference("Feed.count") do
-      post feeds_url, params: { feed: { description: "New feed", name: "Test Feed" } }
+      post feeds_url, params: { feed: { description: "New feed", name: "Test Feed", group_id: groups(:moderators).id } }
     end
     assert_redirected_to feed_url(Feed.last)
   end
@@ -64,7 +64,7 @@ class FeedsControllerTest < ActionDispatch::IntegrationTest
   test "should not allow non-group-admin to create feed" do
     sign_in users(:non_member)  # not a group admin
     assert_no_difference("Feed.count") do
-      post feeds_url, params: { feed: { description: "New feed", name: "Test Feed" } }
+      post feeds_url, params: { feed: { description: "New feed", name: "Test Feed", group_id: groups(:moderators).id } }
     end
     assert_redirected_to root_url
     assert_equal "You are not authorized to perform this action.", flash[:alert]
