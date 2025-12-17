@@ -108,7 +108,9 @@ module GroupManagedPolicy
   #
   # This is used both in the policy and in the view to disable UI elements.
   # System admins can always edit groups.
-  # For new records, any group admin can set the initial group.
+  # For new records, any logged-in user can see/edit the group field in the UI.
+  #   (The actual security check happens in can_create?, which verifies the user
+  #   is admin of the selected group before allowing creation.)
   # For existing records, only admins of the current group can change it.
   def can_edit_group?
     return true if user&.system_admin?
