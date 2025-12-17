@@ -15,6 +15,7 @@ class User < ApplicationRecord
   has_many :admin_groups, through: :admin_memberships, source: :group
 
   after_create :add_to_all_users_group
+  after_create :add_to_admin_group_if_first_user
 
   def password_required?
     super && !is_system_user? # Do not require password for system user.
@@ -68,5 +69,15 @@ class User < ApplicationRecord
     all_users_group = Group.find_or_create_by!(name: Group::REGISTERED_USERS_GROUP_NAME)
 
     self.groups << all_users_group unless self.groups.include?(all_users_group)
+  end
+
+  def add_to_admin_group_if_first_user
+    return if is_system_user?
+    return unless User.where(is_system_user: [ nil, false ]).count == 1
+
+    system_admins_group = Group.find_or_create_by!(name: Group::SYSTEM_ADMIN_GROUP_NAME)
+    Membership.find_or_create_by!(user: self, group: system_admins_group) do |membership|
+      membership.role = :admin
+    end
   end
 end
