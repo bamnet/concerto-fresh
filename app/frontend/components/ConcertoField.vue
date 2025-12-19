@@ -45,15 +45,6 @@ const props = defineProps({
 const currentContent = shallowRef(null);
 const currentContentConfig = ref({});
 
-const contentKey = computed(() => {
-  // Reuse the video component to avoid destroying/recreating iframes (expensive).
-  // For other types like Graphic, we want the transition effect, so we use the ID to force a swap.
-  if (currentContentConfig.value?.type === 'Video') {
-    return 'persistent-video-player';
-  }
-  return currentContentConfig.value?.id;
-});
-
 const contentQueue = [];
 let nextContentTimer = null;
 let loadContentRetryTimer = null;
@@ -126,7 +117,8 @@ function showNextContent() {
 function next() {
   if (contentQueue.length > 0) {
     showNextContent();
-  } else {
+  }
+ else {
     loadContent();
   }
 }
@@ -161,7 +153,7 @@ onBeforeUnmount(() => {
     <Transition>
       <component
         :is="currentContent"
-        :key="contentKey"
+        :key="currentContentConfig.id"
         :content="currentContentConfig"
         @click="next"
         @take-over-timer="delegateTimerToContent"
