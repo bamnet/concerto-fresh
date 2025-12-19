@@ -13,16 +13,32 @@ const backgroundImageStyle = computed(() => {
   return `url(${backgroundImage.value})`;
 });
 
-async function loadConfig() {
-  const resp = await fetch(props.apiUrl);
-  const screen = await resp.json();
-  backgroundImage.value = screen.template.background_uri;
+async function loadConfig(retryCount = 0) {
+  const maxRetries = 3;
+  const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000); // Exponential backoff, max 10s
 
-  positions.value = [];
+  try {
+    const resp = await fetch(props.apiUrl);
 
-  screen.positions.forEach(position => {
-    positions.value.push(position);
-  });
+    if (!resp.ok) {
+      throw new Error(`HTTP error! status: ${resp.status}`);
+    }
+
+    const screen = await resp.json();
+    backgroundImage.value = screen.template.background_uri;
+    positions.value = screen.positions;
+  } catch (error) {
+    console.error(`Failed to load screen configuration (attempt ${retryCount + 1}/${maxRetries + 1}):`, error);
+
+    if (retryCount < maxRetries) {
+      console.debug(`Retrying in ${retryDelay}ms...`);
+      setTimeout(() => loadConfig(retryCount + 1), retryDelay);
+    } else {
+      console.error('Max retries reached. Screen configuration loading failed.');
+      // Schedule another attempt after a longer delay
+      setTimeout(() => loadConfig(0), 60000); // Retry after 1 minute
+    }
+  }
 }
 
 // lifecycle hooks

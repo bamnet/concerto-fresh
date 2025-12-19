@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, shallowRef } from 'vue'
+import { onMounted, onBeforeUnmount, ref, shallowRef } from 'vue'
 
 import ConcertoGraphic from './ConcertoGraphic.vue';
 import ConcertoRichText from './ConcertoRichText.vue';
@@ -43,13 +43,34 @@ const currentContentConfig = ref({});
 const contentQueue = [];
 let nextContentTimer = null;
 
-async function loadContent() {
-  const resp = await fetch(props.apiUrl);
-  const contents = await resp.json();
-  contentQueue.push(...contents);
+async function loadContent(retryCount = 0) {
+  const maxRetries = 3;
+  const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000); // Exponential backoff, max 10s
 
-  if (contentQueue.length > 0 ){
-    showNextContent();
+  try {
+    const resp = await fetch(props.apiUrl);
+
+    if (!resp.ok) {
+      throw new Error(`HTTP error! status: ${resp.status}`);
+    }
+
+    const contents = await resp.json();
+    contentQueue.push(...contents);
+
+    if (contentQueue.length > 0) {
+      showNextContent();
+    }
+  } catch (error) {
+    console.error(`Failed to load content (attempt ${retryCount + 1}/${maxRetries + 1}):`, error);
+
+    if (retryCount < maxRetries) {
+      console.debug(`Retrying in ${retryDelay}ms...`);
+      setTimeout(() => loadContent(retryCount + 1), retryDelay);
+    } else {
+      console.error('Max retries reached. Content loading failed.');
+      // Schedule another attempt after a longer delay
+      setTimeout(() => loadContent(0), 60000); // Retry after 1 minute
+    }
   }
 }
 
@@ -95,6 +116,11 @@ function delegateTimerToContent() {
 // lifecycle hooks
 onMounted(() => {
   loadContent();
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(nextContentTimer);
+  nextContentTimer = null;
 })
 </script>
 
