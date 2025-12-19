@@ -41,9 +41,11 @@ async function resizeText() {
 
   // Use binary search to find optimal font size
   // This reduces layout reflows from O(n) to O(log n)
-  let minSize = 1;
-  let maxSize = 500; // Maximum 500% font size
-  let bestSize = 100;
+  const MIN_FONT_SIZE = 1;
+  const MAX_FONT_SIZE = 2000; // Maximum font size for large TV displays
+  let minSize = MIN_FONT_SIZE;
+  let maxSize = MAX_FONT_SIZE;
+  let bestSize = MIN_FONT_SIZE;
 
   // Binary search for the largest font size that fits
   while (minSize <= maxSize) {
@@ -65,8 +67,6 @@ async function resizeText() {
 
   // Apply the best size found
   containerElement.style.fontSize = `${bestSize}%`;
-
-  console.debug(`Optimal font size: ${bestSize}% (found in ${Math.ceil(Math.log2(500))} iterations vs ~${Math.abs(bestSize - 100)} with linear search)`);
 }
 
 // lifecycle hooks
