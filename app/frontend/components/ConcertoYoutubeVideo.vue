@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
 
 const props = defineProps({
   content: { type: Object, required: true }
@@ -15,6 +15,9 @@ const videoUrl = computed(() => {
   return `https://www.youtube-nocookie.com/embed/${props.content.video_id}?rel=0&iv_load_policy=3&autoplay=1&controls=0&playsinline=1&mute=1&enablejsapi=1`;
 })
 
+const playerRef = ref(null);
+let player = null;
+
 function isYTAPILoaded() {
   /* global YT */
   return (window.YT && window.YT.Player);
@@ -22,6 +25,20 @@ function isYTAPILoaded() {
 
 async function loadYTAPI() {
   return new Promise((resolve) => {
+    // Check if script is already in the DOM
+    const existingScript = document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
+    if (existingScript) {
+      // Script exists but API might still be loading
+      // Wait for it to be ready
+      const checkReady = setInterval(() => {
+        if (isYTAPILoaded()) {
+          clearInterval(checkReady);
+          resolve();
+        }
+      }, 100);
+      return;
+    }
+
     window.onYouTubeIframeAPIReady = () => {
       console.debug('YouTube Iframe API loaded');
       resolve();
@@ -64,17 +81,24 @@ onMounted(async () => {
     await loadYTAPI();
   }
 
-  new YT.Player('yt-player', {
+  player = new YT.Player(playerRef.value, {
     events: {
       'onStateChange': onPlayerStateChange
     }
   });
 })
+
+onBeforeUnmount(() => {
+  if (player && typeof player.destroy === 'function') {
+    player.destroy();
+    player = null;
+  }
+})
 </script>
 
 <template>
   <iframe
-    id="yt-player"
+    ref="playerRef"
     class="player"
     type="text/html"
     frameborder="0"
