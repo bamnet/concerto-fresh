@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onBeforeUnmount, ref, shallowRef } from 'vue'
+import { onMounted, onBeforeUnmount, ref, shallowRef, computed } from 'vue'
 
 import ConcertoGraphic from './ConcertoGraphic.vue';
 import ConcertoRichText from './ConcertoRichText.vue';
@@ -45,6 +45,15 @@ const props = defineProps({
 const currentContent = shallowRef(null);
 const currentContentConfig = ref({});
 
+const contentKey = computed(() => {
+  // Reuse the video component to avoid destroying/recreating iframes (expensive).
+  // For other types like Graphic, we want the transition effect, so we use the ID to force a swap.
+  if (currentContentConfig.value?.type === 'Video') {
+    return 'persistent-video-player';
+  }
+  return currentContentConfig.value?.id;
+});
+
 const contentQueue = [];
 let nextContentTimer = null;
 let loadContentRetryTimer = null;
@@ -80,6 +89,16 @@ async function loadContent(retryCount = 0) {
   }
 }
 
+function preloadNextContent() {
+  if (contentQueue.length > 0) {
+    const next = contentQueue[0];
+    if (next.type === 'Graphic' && next.image) {
+      const img = new Image();
+      img.src = next.image;
+    }
+  }
+}
+
 function showNextContent() {
   clearTimeout(nextContentTimer);
 
@@ -93,6 +112,7 @@ function showNextContent() {
     }
     currentContent.value = nextContentType;
     currentContentConfig.value = nextContent;
+    preloadNextContent();
   }
   
   const duration = (nextContent?.duration || defaultDuration) * 1000;
@@ -141,7 +161,7 @@ onBeforeUnmount(() => {
     <Transition>
       <component
         :is="currentContent"
-        :key="currentContentConfig.id"
+        :key="contentKey"
         :content="currentContentConfig"
         @click="next"
         @take-over-timer="delegateTimerToContent"
