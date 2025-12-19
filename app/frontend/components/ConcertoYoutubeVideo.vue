@@ -1,6 +1,9 @@
 <script setup>
 import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
 
+const YOUTUBE_API_URL = 'https://www.youtube.com/iframe_api';
+const API_LOAD_TIMEOUT_MS = 30000; // 30 seconds
+
 const props = defineProps({
   content: { type: Object, required: true }
 });
@@ -24,16 +27,22 @@ function isYTAPILoaded() {
 }
 
 async function loadYTAPI() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     // Check if script is already in the DOM
-    const existingScript = document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
+    const existingScript = document.querySelector(`script[src="${YOUTUBE_API_URL}"]`);
     if (existingScript) {
       // Script exists but API might still be loading
-      // Wait for it to be ready
+      // Wait for it to be ready with timeout
+      const maxAttempts = API_LOAD_TIMEOUT_MS / 100;
+      let attempts = 0;
       const checkReady = setInterval(() => {
         if (isYTAPILoaded()) {
           clearInterval(checkReady);
           resolve();
+        } else if (attempts++ >= maxAttempts) {
+          clearInterval(checkReady);
+          console.error('Timed out waiting for YouTube API to load.');
+          reject(new Error('YouTube API load timeout'));
         }
       }, 100);
       return;
@@ -47,7 +56,7 @@ async function loadYTAPI() {
     };
 
     const script = document.createElement('script');
-    script.src = 'https://www.youtube.com/iframe_api';
+    script.src = YOUTUBE_API_URL;
     document.head.appendChild(script);
   });
 }
