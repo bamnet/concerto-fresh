@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onBeforeUnmount, ref, shallowRef } from 'vue'
+import { onMounted, onBeforeUnmount, ref, shallowRef, computed, nextTick } from 'vue'
 
 import ConcertoGraphic from './ConcertoGraphic.vue';
 import ConcertoRichText from './ConcertoRichText.vue';
@@ -45,6 +45,17 @@ const props = defineProps({
 const currentContent = shallowRef(null);
 const currentContentConfig = ref({});
 
+// Used for manual fade-through transitions when recycling components (like Video).
+const manualTransitionVisible = ref(true);
+
+const contentKey = computed(() => {
+  // Reuse the video component to avoid destroying/recreating iframes (expensive).
+  if (currentContentConfig.value?.type === 'Video') {
+    return 'persistent-video-player';
+  }
+  return currentContentConfig.value?.id;
+});
+
 const contentQueue = [];
 let nextContentTimer = null;
 let loadContentRetryTimer = null;
@@ -80,19 +91,47 @@ async function loadContent(retryCount = 0) {
   }
 }
 
-function showNextContent() {
+async function showNextContent() {
   clearTimeout(nextContentTimer);
 
   const nextContent = contentQueue.shift();
-  if (nextContent) {
-    const nextContentType = contentTypeMap.get(nextContent.type);
-    if (!nextContentType) {
-      console.error(`Unknown content type: ${nextContent.type}`);
-      next();
-      return;
-    }
+  if (!nextContent) {
+    next(); // Should trigger loadContent via next() logic
+    return;
+  }
+
+  const nextContentType = contentTypeMap.get(nextContent.type);
+  if (!nextContentType) {
+    console.error(`Unknown content type: ${nextContent.type}`);
+    next();
+    return;
+  }
+
+  // Check if we are transitioning between two Videos (reused component).
+  const isVideoToVideo = (currentContentConfig.value?.type === 'Video' && nextContent.type === 'Video');
+
+  if (isVideoToVideo) {
+    // Perform manual "Fade-Through" transition.
+    // 1. Fade out
+    manualTransitionVisible.value = false;
+    
+    // Wait for fade out to complete (500ms matches CSS transition)
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 2. Swap content while hidden
     currentContent.value = nextContentType;
     currentContentConfig.value = nextContent;
+
+    // Small delay to allow component to update props
+    await nextTick();
+    
+    // 3. Fade in
+    manualTransitionVisible.value = true;
+  } else {
+    // Normal transition (Vue <Transition> handles it)
+    currentContent.value = nextContentType;
+    currentContentConfig.value = nextContent;
+    manualTransitionVisible.value = true; // Ensure visible
   }
   
   const duration = (nextContent?.duration || defaultDuration) * 1000;
@@ -139,14 +178,19 @@ onBeforeUnmount(() => {
     :style="fieldStyle"
   >
     <Transition>
-      <component
-        :is="currentContent"
-        :key="currentContentConfig.id"
-        :content="currentContentConfig"
-        @click="next"
-        @take-over-timer="delegateTimerToContent"
-        @next="next"
-      />
+      <div
+        class="content-wrapper"
+        :class="{ 'faded-out': !manualTransitionVisible }"
+      >
+        <component
+          :is="currentContent"
+          :key="contentKey"
+          :content="currentContentConfig"
+          @click="next"
+          @take-over-timer="delegateTimerToContent"
+          @next="next"
+        />
+      </div>
     </Transition>
   </div>
 </template>
@@ -159,6 +203,17 @@ onBeforeUnmount(() => {
 
   .dev-border {
     border: 1px dashed yellow;
+  }
+
+  .content-wrapper {
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.5s ease;
+    opacity: 1;
+  }
+
+  .content-wrapper.faded-out {
+    opacity: 0;
   }
 
   .v-enter-active,
