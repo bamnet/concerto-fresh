@@ -1,6 +1,11 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import ConcertoField from './ConcertoField.vue'
+
+// Retry configuration
+const INITIAL_RETRY_DELAY_MS = 1000;
+const MAX_RETRY_DELAY_MS = 10000;
+const LONG_RETRY_DELAY_MS = 60000;
 
 const props = defineProps({
   apiUrl: {type: String, required: true}
@@ -8,6 +13,7 @@ const props = defineProps({
 
 const backgroundImage = ref("");
 const positions = ref([]);
+let loadConfigRetryTimer = null;
 
 const backgroundImageStyle = computed(() => {
   return `url(${backgroundImage.value})`;
@@ -15,7 +21,7 @@ const backgroundImageStyle = computed(() => {
 
 async function loadConfig(retryCount = 0) {
   const maxRetries = 3;
-  const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000); // Exponential backoff, max 10s
+  const retryDelay = Math.min(INITIAL_RETRY_DELAY_MS * Math.pow(2, retryCount), MAX_RETRY_DELAY_MS);
 
   try {
     const resp = await fetch(props.apiUrl);
@@ -32,11 +38,11 @@ async function loadConfig(retryCount = 0) {
 
     if (retryCount < maxRetries) {
       console.debug(`Retrying in ${retryDelay}ms...`);
-      setTimeout(() => loadConfig(retryCount + 1), retryDelay);
+      loadConfigRetryTimer = setTimeout(() => loadConfig(retryCount + 1), retryDelay);
     } else {
       console.error('Max retries reached. Screen configuration loading failed.');
       // Schedule another attempt after a longer delay
-      setTimeout(() => loadConfig(0), 60000); // Retry after 1 minute
+      loadConfigRetryTimer = setTimeout(() => loadConfig(0), LONG_RETRY_DELAY_MS);
     }
   }
 }
@@ -44,6 +50,11 @@ async function loadConfig(retryCount = 0) {
 // lifecycle hooks
 onMounted(() => {
   loadConfig();
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(loadConfigRetryTimer);
+  loadConfigRetryTimer = null;
 })
 </script>
 

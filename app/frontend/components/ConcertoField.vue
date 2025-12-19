@@ -15,6 +15,11 @@ const disableTimer = false;
 // Show debug border only in development mode
 const isDevelopment = import.meta.env.DEV;
 
+// Retry configuration
+const INITIAL_RETRY_DELAY_MS = 1000;
+const MAX_RETRY_DELAY_MS = 10000;
+const LONG_RETRY_DELAY_MS = 60000;
+
 const contentTypeMap = new Map([
   ["Graphic", ConcertoGraphic],
   ["RichText", ConcertoRichText],
@@ -24,14 +29,14 @@ const contentTypeMap = new Map([
 const props = defineProps({
   /**
    * API endpoint which will load content for this field.
-   * 
+   *
    * This typically looks like /frontend/screens/:screen_id/fields/:field_id/content.json.
    */
   apiUrl: {type: String, required: true},
 
   /**
    * CSS style to be applied to the field.
-   * 
+   *
    * This is often used to set font family and color to align with the template.
    */
   fieldStyle: {type: String, required: false, default: ''},
@@ -42,10 +47,11 @@ const currentContentConfig = ref({});
 
 const contentQueue = [];
 let nextContentTimer = null;
+let loadContentRetryTimer = null;
 
 async function loadContent(retryCount = 0) {
   const maxRetries = 3;
-  const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000); // Exponential backoff, max 10s
+  const retryDelay = Math.min(INITIAL_RETRY_DELAY_MS * Math.pow(2, retryCount), MAX_RETRY_DELAY_MS);
 
   try {
     const resp = await fetch(props.apiUrl);
@@ -65,11 +71,11 @@ async function loadContent(retryCount = 0) {
 
     if (retryCount < maxRetries) {
       console.debug(`Retrying in ${retryDelay}ms...`);
-      setTimeout(() => loadContent(retryCount + 1), retryDelay);
+      loadContentRetryTimer = setTimeout(() => loadContent(retryCount + 1), retryDelay);
     } else {
       console.error('Max retries reached. Content loading failed.');
       // Schedule another attempt after a longer delay
-      setTimeout(() => loadContent(0), 60000); // Retry after 1 minute
+      loadContentRetryTimer = setTimeout(() => loadContent(0), LONG_RETRY_DELAY_MS);
     }
   }
 }
@@ -121,6 +127,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearTimeout(nextContentTimer);
   nextContentTimer = null;
+  clearTimeout(loadContentRetryTimer);
+  loadContentRetryTimer = null;
 })
 </script>
 
