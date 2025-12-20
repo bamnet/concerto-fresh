@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, onBeforeUnmount, ref, shallowRef } from 'vue'
 
-import ConcertoGraphic from './ConcertoGraphic.vue';
+import ConcertoGraphic, { preload as preloadGraphic } from './ConcertoGraphic.vue';
 import ConcertoRichText from './ConcertoRichText.vue';
 import ConcertoVideo from './ConcertoVideo.vue';
 
@@ -26,6 +26,11 @@ const contentTypeMap = new Map([
   ["Video", ConcertoVideo]
 ]);
 
+const preloadFunctionMap = new Map([
+  ["Graphic", preloadGraphic],
+  // Future: ["Video", preloadVideo],
+]);
+
 const props = defineProps({
   /**
    * API endpoint which will load content for this field.
@@ -48,6 +53,7 @@ const currentContentConfig = ref({});
 const contentQueue = [];
 let nextContentTimer = null;
 let loadContentRetryTimer = null;
+let lastPreloadedUrl = null;
 
 async function loadContent(retryCount = 0) {
   const maxRetries = 3;
@@ -80,6 +86,69 @@ async function loadContent(retryCount = 0) {
   }
 }
 
+/**
+ * Gets a unique identifier for content to track preload status.
+ * @param {Object} content - The content object
+ * @returns {string|number} A unique identifier for the content
+ */
+function getContentIdentifier(content) {
+  switch (content.type) {
+  case 'Graphic':
+    return content.image;
+    // Future cases for other content types
+  default:
+    return content.id;
+  }
+}
+
+/**
+ * Preloads the next content in the queue if it supports preloading.
+ * Scans ahead in the queue to find the next preloadable content type.
+ * This is non-blocking and failures don't affect content display.
+ */
+async function preloadNextContent() {
+  if (contentQueue.length === 0) {
+    // No content to preload
+    return;
+  }
+
+  // Scan ahead to find the next preloadable content
+  let nextContent = null;
+  let preloadFunction = null;
+  for (const content of contentQueue) {
+    preloadFunction = preloadFunctionMap.get(content.type);
+    if (preloadFunction) {
+      nextContent = content;
+      break;
+    } else {
+      console.debug(`No preload function for content type: ${content.type}`);
+    }
+  }
+
+  if (!nextContent || !preloadFunction) {
+    // No preloadable content found in queue
+    return;
+  }
+
+  // Avoid preloading the same content twice
+  const contentIdentifier = getContentIdentifier(nextContent);
+  if (contentIdentifier === lastPreloadedUrl) {
+    console.debug(`Already preloaded: ${contentIdentifier}`);
+    return;
+  }
+
+  console.debug(`Preloading next content (${nextContent.type}):`, contentIdentifier);
+  lastPreloadedUrl = contentIdentifier;
+
+  try {
+    await preloadFunction(nextContent);
+  } catch (error) {
+    // Preload errors are logged by the preload function
+    // We catch here to prevent unhandled promise rejections
+    console.error('Unexpected error in preload:', error);
+  }
+}
+
 function showNextContent() {
   clearTimeout(nextContentTimer);
 
@@ -93,8 +162,11 @@ function showNextContent() {
     }
     currentContent.value = nextContentType;
     currentContentConfig.value = nextContent;
+
+    // Preload next content (non-blocking)
+    preloadNextContent();
   }
-  
+
   const duration = (nextContent?.duration || defaultDuration) * 1000;
   if (!disableTimer) {
     nextContentTimer = setTimeout(next, duration);
@@ -107,6 +179,8 @@ function next() {
   if (contentQueue.length > 0) {
     showNextContent();
   } else {
+    // Reset preload tracking when queue empties
+    lastPreloadedUrl = null;
     loadContent();
   }
 }
@@ -129,6 +203,7 @@ onBeforeUnmount(() => {
   nextContentTimer = null;
   clearTimeout(loadContentRetryTimer);
   loadContentRetryTimer = null;
+  lastPreloadedUrl = null;
 })
 </script>
 

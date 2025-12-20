@@ -1,3 +1,56 @@
+<script>
+/**
+ * Preloads a graphic by creating an Image object and loading its source.
+ * This allows the browser to cache the image before it's displayed.
+ *
+ * @param {Object} content - The content object containing the image URL
+ * @returns {Promise} A promise that always resolves (never rejects) to avoid blocking content display
+ */
+export function preload(content) {
+  return new Promise((resolve) => {
+    const IMAGE_LOAD_TIMEOUT_MS = 30000; // 30 seconds
+
+    if (!content || !content.image) {
+      console.warn('ConcertoGraphic.preload: No image URL provided');
+      resolve();
+      return;
+    }
+
+    const img = new Image();
+    let timeoutId = null;
+
+    const cleanup = () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      img.onload = null;
+      img.onerror = null;
+    };
+
+    img.onload = () => {
+      console.debug(`Preloaded graphic: ${content.image}`);
+      cleanup();
+      resolve();
+    };
+
+    img.onerror = (error) => {
+      console.warn(`Failed to preload graphic: ${content.image}`, error);
+      cleanup();
+      resolve(); // Resolve anyway, don't block display
+    };
+
+    timeoutId = setTimeout(() => {
+      console.warn(`Timeout preloading graphic: ${content.image}`);
+      cleanup();
+      resolve(); // Resolve anyway, don't block display
+    }, IMAGE_LOAD_TIMEOUT_MS);
+
+    img.src = content.image;
+  });
+}
+</script>
+
 <script setup>
 import { computed } from 'vue';
 

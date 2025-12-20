@@ -193,4 +193,107 @@ describe('ConcertoField', () => {
     await nextTick();
     expect(wrapper.findComponent(ConcertoRichText).exists()).toBe(true);
   });
+
+  describe('preloading', () => {
+    let preloadedImages = [];
+
+    beforeAll(() => {
+      // Mock Image constructor to track preloaded images
+      // eslint-disable-next-line no-undef
+      global.Image = class {
+        set src(value) {
+          preloadedImages.push(value);
+          setTimeout(() => this.onload && this.onload(), 0);
+        }
+        set onload(callback) { this._onload = callback; }
+        get onload() { return this._onload; }
+        set onerror(callback) { this._onerror = callback; }
+      };
+    });
+
+    afterEach(() => {
+      preloadedImages = [];
+    });
+
+    it('preloads next graphic after showing current content', async () => {
+      mount(ConcertoField, {
+        props: { apiUrl: fieldContentUrl },
+        global: { stubs: { transition: false } }
+      });
+
+      await flushPromises();
+
+      // After showing first graphic, should preload second graphic (welcome.jpg)
+      // Note: Second item is RichText, so it should skip to third item
+      await nextTick();
+      await flushPromises();
+      await nextTick(); // Wait for preload to trigger
+      await flushPromises(); // Wait for preload promise to resolve
+
+      expect(preloadedImages).toContain('welcome.jpg');
+    });
+
+    it('does not preload non-graphic content', async () => {
+      mount(ConcertoField, {
+        props: { apiUrl: fieldContentUrl },
+        global: { stubs: { transition: false } }
+      });
+
+      await flushPromises();
+
+      // Should not preload RichText content
+      await nextTick();
+      await flushPromises();
+
+      // Check that all preloaded URLs are image files
+      preloadedImages.forEach(url => {
+        expect(['poster.png', 'welcome.jpg']).toContain(url);
+      });
+    });
+
+    it('avoids duplicate preloads', async () => {
+      vi.useFakeTimers();
+
+      mount(ConcertoField, {
+        props: { apiUrl: fieldContentUrl },
+        global: { stubs: { transition: false } }
+      });
+
+      await flushPromises();
+
+      // Advance to next content
+      vi.advanceTimersToNextTimer();
+      await nextTick();
+      await flushPromises();
+
+      // Should not have duplicate URLs
+      const uniqueUrls = new Set(preloadedImages);
+      expect(preloadedImages.length).toBe(uniqueUrls.size);
+
+      vi.useRealTimers();
+    });
+
+    it('handles preload errors gracefully', async () => {
+      // Mock Image to always fail
+      // eslint-disable-next-line no-undef
+      global.Image = class {
+        set src(value) {
+          preloadedImages.push(value);
+          setTimeout(() => this.onerror && this.onerror(new Error('Failed')), 0);
+        }
+        set onload(callback) { this._onload = callback; }
+        set onerror(callback) { this._onerror = callback; }
+      };
+
+      const wrapper = mount(ConcertoField, {
+        props: { apiUrl: fieldContentUrl },
+        global: { stubs: { transition: false } }
+      });
+
+      await flushPromises();
+
+      // Content should still display normally
+      expect(wrapper.findComponent(ConcertoGraphic).exists()).toBe(true);
+    });
+  });
 })
