@@ -1,3 +1,20 @@
+<script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+  content: {type: Object, required: true}
+});
+
+const backgroundImageUrl = computed(() => {
+  return `url(${props.content.image})`;
+})
+
+</script>
+
+<template>
+  <div class="graphic" />
+</template>
+
 <script>
 /**
  * Preloads a graphic by creating an Image object and loading its source.
@@ -51,23 +68,6 @@ export function preload(content) {
 }
 </script>
 
-<script setup>
-import { computed } from 'vue';
-
-const props = defineProps({
-  content: {type: Object, required: true}
-});
-
-const backgroundImageUrl = computed(() => {
-  return `url(${props.content.image})`;
-})
-
-</script>
-
-<template>
-  <div class="graphic" />
-</template>
-  
 <style scoped>
   .graphic {
     display: block;

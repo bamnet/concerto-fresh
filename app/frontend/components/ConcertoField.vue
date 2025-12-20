@@ -26,9 +26,13 @@ const contentTypeMap = new Map([
   ["Video", ConcertoVideo]
 ]);
 
+/**
+ * Map of content types to their preload functions.
+ * Components that support preloading should export a preload(content) function.
+ * The preload function should return a Promise that resolves when preloading completes.
+ */
 const preloadFunctionMap = new Map([
   ["Graphic", preloadGraphic],
-  // Future: ["Video", preloadVideo],
 ]);
 
 const props = defineProps({
@@ -103,7 +107,8 @@ function getContentIdentifier(content) {
 
 /**
  * Preloads the next content in the queue if it supports preloading.
- * Scans ahead in the queue to find the next preloadable content type.
+ * Only checks the immediate next item - if it doesn't support preloading,
+ * we'll try again when the next content comes up.
  * This is non-blocking and failures don't affect content display.
  */
 async function preloadNextContent() {
@@ -112,21 +117,12 @@ async function preloadNextContent() {
     return;
   }
 
-  // Scan ahead to find the next preloadable content
-  let nextContent = null;
-  let preloadFunction = null;
-  for (const content of contentQueue) {
-    preloadFunction = preloadFunctionMap.get(content.type);
-    if (preloadFunction) {
-      nextContent = content;
-      break;
-    } else {
-      console.debug(`No preload function for content type: ${content.type}`);
-    }
-  }
+  const nextContent = contentQueue[0]; // Peek at next item
+  const preloadFunction = preloadFunctionMap.get(nextContent.type);
 
-  if (!nextContent || !preloadFunction) {
-    // No preloadable content found in queue
+  if (!preloadFunction) {
+    // This content type doesn't support preloading, skip it
+    console.debug(`No preload function for content type: ${nextContent.type}`);
     return;
   }
 

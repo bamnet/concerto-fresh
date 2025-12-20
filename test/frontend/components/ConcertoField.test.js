@@ -223,14 +223,13 @@ describe('ConcertoField', () => {
 
       await flushPromises();
 
-      // After showing first graphic, should preload second graphic (welcome.jpg)
-      // Note: Second item is RichText, so it should skip to third item
+      // After showing first graphic (poster.png), the next item is RichText
+      // which doesn't support preloading, so nothing should be preloaded yet
       await nextTick();
       await flushPromises();
-      await nextTick(); // Wait for preload to trigger
-      await flushPromises(); // Wait for preload promise to resolve
 
-      expect(preloadedImages).toContain('welcome.jpg');
+      // Preload is not called since next item is RichText
+      expect(preloadedImages).not.toContain('welcome.jpg');
     });
 
     it('does not preload non-graphic content', async () => {
