@@ -46,7 +46,6 @@ export function preload(content) {
     };
 
     img.onload = () => {
-      console.debug(`Preloaded graphic: ${content.image}`);
       cleanup();
       resolve();
     };
