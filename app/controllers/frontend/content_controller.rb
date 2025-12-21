@@ -7,6 +7,7 @@ class Frontend::ContentController < Frontend::ApplicationController
     @content = []
 
     # Check for active pinned content
+    # TODO: Refactor this when Content objects support a method to check if they are active or not.
     field_config = FieldConfig.find_by(screen: @screen, field: @field)
     if field_config&.pinned_content_id
       pinned = Content.active.find_by(id: field_config.pinned_content_id)
@@ -19,13 +20,13 @@ class Frontend::ContentController < Frontend::ApplicationController
       @content = @subscriptions.flat_map do |subscription|
         subscription.contents
       end
-    end
 
-    # Remove content which should not be rendered in this position.
-    # For example, a 4:3 graphic should probably not be rendered in a
-    # long horizontal ticker field.
-    @content.delete_if do |c|
-      !c.should_render_in?(@position)
+      # Remove content which should not be rendered in this position.
+      # For example, a 4:3 graphic should probably not be rendered in a
+      # long horizontal ticker field.
+      @content.delete_if do |c|
+        !c.should_render_in?(@position)
+      end
     end
 
     logger.debug "Found #{@content.count} content to render in #{@screen.name}'s #{@field.name} field"
