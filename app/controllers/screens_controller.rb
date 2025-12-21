@@ -89,6 +89,7 @@ class ScreensController < ApplicationController
     # (Not extracted to a concern to keep controller logic simple and conventional.)
     def set_form_options
       @templates = Template.all.with_attached_image
+      @active_content = Content.active.order(:name)
       if current_user.system_admin?
         @groups = Group.all
       else
