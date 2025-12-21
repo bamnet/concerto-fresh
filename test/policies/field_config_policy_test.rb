@@ -90,12 +90,9 @@ class FieldConfigPolicyTest < ActiveSupport::TestCase
     assert FieldConfigPolicy.new(@system_admin_user, @field_config).destroy?
   end
 
-  test "destroy? is permitted when user can destroy the screen" do
+  test "destroy? is permitted when user can update the screen" do
     assert FieldConfigPolicy.new(@group_admin_user, @field_config).destroy?
-  end
-
-  test "destroy? is denied for regular group member" do
-    refute FieldConfigPolicy.new(@group_regular_user, @field_config).destroy?
+    assert FieldConfigPolicy.new(@group_regular_user, @field_config).destroy?
   end
 
   test "destroy? is denied when user is not a group member" do

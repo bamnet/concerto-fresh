@@ -134,4 +134,30 @@ class FieldConfigTest < ActiveSupport::TestCase
     field_config.reload
     assert_nil field_config.pinned_content_id
   end
+
+  test "validates field belongs to screen's template" do
+    # Create a field that doesn't belong to the template
+    other_field = Field.create!(name: "other_field")
+
+    field_config = FieldConfig.new(
+      screen: @screen,
+      field: other_field,
+      pinned_content: @content
+    )
+
+    assert_not field_config.valid?
+    assert_includes field_config.errors[:field], "does not belong to the screen's template"
+  end
+
+  test "allows field that belongs to screen's template" do
+    # Get a field that belongs to the screen's template
+    position = @screen.template.positions.first
+    field_config = FieldConfig.new(
+      screen: @screen,
+      field: position.field,
+      pinned_content: @content
+    )
+
+    assert field_config.valid?
+  end
 end

@@ -35,7 +35,7 @@ class FieldConfigPolicy < ApplicationPolicy
   end
 
   def destroy?
-    super || screen_policy.destroy?
+    super || screen_policy.update?
   end
 
   def permitted_attributes

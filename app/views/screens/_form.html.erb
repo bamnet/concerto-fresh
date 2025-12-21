@@ -123,7 +123,7 @@
 
           <% screen.template.positions.includes(:field).each do |position| %>
             <% field = position.field %>
-            <% field_config = screen.field_configs.find_or_initialize_by(field_id: field.id) %>
+            <% field_config = @field_configs_by_field&.fetch(field.id, nil) || screen.field_configs.build(field_id: field.id) %>
 
             <%= form.fields_for :field_configs, field_config do |fc| %>
               <%= fc.hidden_field :field_id %>

@@ -17,6 +17,7 @@ class ScreensController < ApplicationController
   def show
     authorize @screen
     @subscriptions_by_field = @screen.subscriptions.includes(:feed).group_by(&:field_id)
+    @field_configs_by_field = @screen.field_configs.includes(:pinned_content).where.not(pinned_content_id: nil).index_by(&:field_id)
   end
 
   # GET /screens/new
@@ -28,6 +29,8 @@ class ScreensController < ApplicationController
   # GET /screens/1/edit
   def edit
     authorize @screen
+    # Pre-load field configs to avoid N+1 queries in the form
+    @field_configs_by_field = @screen.field_configs.index_by(&:field_id) if @screen.persisted?
   end
 
   # POST /screens or /screens.json
