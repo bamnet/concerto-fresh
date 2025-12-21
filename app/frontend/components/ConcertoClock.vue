@@ -5,9 +5,8 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 // and manipulation without requiring a third-party library.
 import { format as formatDate } from 'date-fns'
 
-// MAGIC VARIABLE: Update interval in milliseconds (currently 1 minute)
-// Change this value to adjust how frequently the clock updates
-const UPDATE_INTERVAL_MS = 60000; // 60000ms = 1 minute
+// How frequently the clock updates.
+const UPDATE_INTERVAL_MS = 1000;
 
 /**
  * @typedef {object} ClockContent
