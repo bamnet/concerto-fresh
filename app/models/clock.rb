@@ -7,7 +7,7 @@ class Clock < Content
   def self.formats
     {
       time_12h: "h:mm a",          # 12:34 PM
-      date_short: "EEE, MMM d",    # Monday, Dec 21
+      date_short: "EEE, MMM d",    # Mon, Dec 21
       datetime_short: "h:mm a, MMM d"  # 2:34 PM, Dec 21
     }
   end
