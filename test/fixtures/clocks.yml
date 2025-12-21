@@ -4,7 +4,7 @@ time_12h:
   type: Clock
   name: "12-Hour Clock"
   duration: 10
-  config: {'format': 'h:mm A'}
+  config: {'format': 'h:mm a'}
   user: admin
 
 date_short:
@@ -18,7 +18,7 @@ datetime_short:
   type: Clock
   name: "Date & Time Display"
   duration: 10
-  config: {'format': 'h:mm A, MMM d'}
+  config: {'format': 'h:mm a, MMM d'}
   user: admin
 
 custom_format:
