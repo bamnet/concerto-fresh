@@ -4,9 +4,21 @@ class Frontend::ContentController < Frontend::ApplicationController
     @field = Field.find(params[:field_id])
     @position = Position.find(params[:position_id])
 
-    @subscriptions = @screen.subscriptions.where(field_id: @field.id).to_a
-    @content = @subscriptions.flat_map do |subscription|
-      subscription.contents
+    @content = []
+
+    # Check for active pinned content
+    field_config = FieldConfig.find_by(screen: @screen, field: @field)
+    if field_config&.pinned_content_id
+      pinned = Content.active.find_by(id: field_config.pinned_content_id)
+      @content = [ pinned ] if pinned
+    end
+
+    # Fallback to subscriptions if no active pinned content
+    if @content.empty?
+      @subscriptions = @screen.subscriptions.where(field_id: @field.id).to_a
+      @content = @subscriptions.flat_map do |subscription|
+        subscription.contents
+      end
     end
 
     # Remove content which should not be rendered in this position.
