@@ -4,10 +4,10 @@
 with_pinned_content:
   screen: one
   field: main
-  pinned_content_id: <%= ActiveRecord::FixtureSet.identify(:plain_richtext, :rich_texts) %>
+  pinned_content: plain_richtext
 
 # Field config without pinned content
 without_pinned_content:
   screen: one
   field: sidebar
-  pinned_content_id:
+  pinned_content:
