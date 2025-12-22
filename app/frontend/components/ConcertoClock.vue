@@ -12,34 +12,17 @@ const UPDATE_INTERVAL_MS = 1000;
 /**
  * MULTI-LINE FORMAT SUPPORT
  *
- * The Clock component supports multi-line displays using the {br} delimiter token.
- * This allows users to create clocks that span multiple lines without requiring HTML.
+ * Supports multi-line displays using {br} delimiter. Format string is split on "{br}"
+ * and each segment is formatted independently with date-fns.
  *
- * How it works:
- * 1. The format string is split on the literal text "{br}"
- * 2. Each segment is formatted independently using date-fns
- * 3. Each formatted segment becomes a separate line in the display
+ * Examples:
+ * - "M/d/yyyy{br}h:mm a" → displays date and time on separate lines
+ * - "EEEE{br}M/d{br}h:mm a" → displays day, date, and time on three lines
  *
- * Example format strings:
- * - Single line:   "h:mm:ss a"           → "2:34:56 PM"
- * - Two lines:     "M/d/yyyy{br}h:mm a"  → "12/22/2025"
- *                                           "2:34 PM"
- * - Three lines:   "EEEE{br}M/d{br}h:mm a" → "Sunday"
- *                                             "12/22"
- *                                             "2:34 PM"
- *
- * Important notes:
- * - {br} is case-sensitive (must be lowercase)
- * - {br} is removed from the output (acts as delimiter only)
- * - Each segment is formatted separately, so each must be valid date-fns format
- * - Whitespace around {br} is preserved in each segment
- * - If no {br} is present, the entire string is treated as a single line
- *
- * Why {br} instead of \n or <br>?
- * - {br} is explicit and visible in text inputs
- * - Doesn't require HTML rendering (no v-html, safer)
- * - Won't get stripped by form handling
- * - Easy to document and explain to users
+ * Notes:
+ * - {br} is case-sensitive and whitespace around it is trimmed
+ * - Empty segments render as blank lines
+ * - {br} was chosen over \n or <br> for visibility in text inputs and safety (no v-html)
  */
 
 /**
@@ -81,10 +64,11 @@ async function updateTime() {
     const formatSegments = props.content.format.split('{br}');
 
     // Format each segment separately using date-fns
-    // This allows each line to have its own independent format string
-    const newTimeLines = formatSegments.map(segment =>
-      formatDate(now, segment.trim())
-    );
+    // Empty segments (from consecutive {br} or leading/trailing {br}) render as blank lines
+    const newTimeLines = formatSegments.map(segment => {
+      const trimmed = segment.trim();
+      return trimmed ? formatDate(now, trimmed) : '';
+    });
 
     // Compare arrays by joining to string (simple equality check)
     // Only update if the formatted time has actually changed

@@ -217,4 +217,22 @@ describe('ConcertoClock', () => {
     expect(lines).toHaveLength(1);
     expect(lines[0].text()).toBe('2:34 PM');
   });
+
+  it('handles consecutive {br} delimiters as empty lines', async () => {
+    const testDate = new Date('2025-12-22T14:34:00');
+    vi.setSystemTime(testDate);
+
+    const content = {
+      format: 'h:mm a{br}{br}M/d/yyyy',
+    };
+    const wrapper = mount(ConcertoClock, { props: { content } });
+    await nextTick();
+
+    // Should render three lines: time, blank, date
+    const lines = wrapper.findAll('.clock-line');
+    expect(lines).toHaveLength(3);
+    expect(lines[0].text()).toBe('2:34 PM');
+    expect(lines[1].text()).toBe(''); // Empty line
+    expect(lines[2].text()).toBe('12/22/2025');
+  });
 });
