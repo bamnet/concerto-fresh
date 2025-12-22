@@ -1,21 +1,20 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["customInput", "presetRadio"]
+  static targets = ["customInput", "customRadio"]
 
   connect() {
     this.updateCustomInputState(false) // Don't clear on initial load
   }
 
   // Called when any radio button changes
-  handleRadioChange(event) {
+  handleRadioChange() {
     this.updateCustomInputState(true) // Clear when switching radios
   }
 
   updateCustomInputState(shouldClearWhenDisabled = false) {
     // Check if the custom format radio is selected
-    const customRadio = this.element.querySelector('#clock_format_custom')
-    const isCustomSelected = customRadio && customRadio.checked
+    const isCustomSelected = this.hasCustomRadioTarget && this.customRadioTarget.checked
 
     if (this.hasCustomInputTarget) {
       if (isCustomSelected) {

@@ -37,11 +37,11 @@ class ClocksTest < ApplicationSystemTestCase
     click_on "Save Clock"
 
     assert_text "Clock was successfully created"
-    click_on "Back"
 
-    # Verify the custom format was saved
-    click_on "Custom Clock"
-    assert_text "h:mm:ss a"
+    # Verify the custom format was saved by checking the edit form
+    click_on "Edit this clock"
+    assert find_field("clock_format_custom").checked?
+    assert_equal "h:mm:ss a", find_field("clock_custom_format_input").value
   end
 
   test "should edit clock with custom format and preserve format string" do
