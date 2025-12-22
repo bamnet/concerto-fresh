@@ -32,7 +32,9 @@ export function useTextResize() {
       return
     }
 
-    console.debug(`Field height: ${fieldHeight}, Initial content height: ${initialHeight}`)
+    if (import.meta.env.DEV) {
+      console.debug(`Field height: ${fieldHeight}, Initial content height: ${initialHeight}`)
+    }
 
     // Use binary search to find optimal font size
     const MIN_FONT_SIZE = 1

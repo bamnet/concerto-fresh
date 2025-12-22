@@ -70,10 +70,11 @@ onBeforeUnmount(() => {
     ref="containerRef"
     class="concerto-clock"
   >
-    <div ref="childRef">
-      <div class="clock-display">
-        {{ currentTime }}
-      </div>
+    <div
+      ref="childRef"
+      class="clock-display"
+    >
+      {{ currentTime }}
     </div>
   </div>
 </template>
