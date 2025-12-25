@@ -15,7 +15,7 @@ class Clock < Content
   validates :format, presence: true
   validate :format_must_be_string
 
-  # The clock has it's own policy class since
+  # The clock has its own policy class since
   # most users should not create clocks.
   def self.policy_class
     ClockPolicy
