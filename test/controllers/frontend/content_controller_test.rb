@@ -62,17 +62,7 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should only return active content from subscriptions" do
-    screen = screens(:one)
-    field = fields(:main)
-    position = positions(:one)
-
-    # Cleanup existing data
-    Subscription.where(screen: screen, field: field).destroy_all
-    FieldConfig.where(screen: screen, field: field).destroy_all
-
-    # Setup feed and subscription
-    feed = Feed.create!(name: "Test Feed", group: groups(:feed_one_owners))
-    subscription = Subscription.create!(screen: screen, field: field, feed: feed)
+    setup_subscription_scenario
 
     # Create active content (should be returned)
     active_content = RichText.create!(
@@ -84,7 +74,7 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
       end_time: 1.hour.from_now,
       config: { render_as: "plaintext" }
     )
-    Submission.create!(content: active_content, feed: feed)
+    Submission.create!(content: active_content, feed: @feed)
 
     # Create expired content (should NOT be returned)
     expired_content = RichText.create!(
@@ -96,7 +86,7 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
       end_time: 1.day.ago,
       config: { render_as: "plaintext" }
     )
-    Submission.create!(content: expired_content, feed: feed)
+    Submission.create!(content: expired_content, feed: @feed)
 
     # Create upcoming content (should NOT be returned)
     upcoming_content = RichText.create!(
@@ -108,9 +98,9 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
       end_time: 2.hours.from_now,
       config: { render_as: "plaintext" }
     )
-    Submission.create!(content: upcoming_content, feed: feed)
+    Submission.create!(content: upcoming_content, feed: @feed)
 
-    get frontend_content_url(screen_id: screen.id, field_id: field.id, position_id: position.id)
+    get frontend_content_url(screen_id: @screen.id, field_id: @field.id, position_id: @position.id)
     assert_response :success
 
     data = response.parsed_body
@@ -124,17 +114,7 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should filter out expired subscription content" do
-    screen = screens(:one)
-    field = fields(:main)
-    position = positions(:one)
-
-    # Cleanup existing data
-    Subscription.where(screen: screen, field: field).destroy_all
-    FieldConfig.where(screen: screen, field: field).destroy_all
-
-    # Setup feed and subscription
-    feed = Feed.create!(name: "Test Feed", group: groups(:feed_one_owners))
-    Subscription.create!(screen: screen, field: field, feed: feed)
+    setup_subscription_scenario
 
     # Create only expired content
     expired_content = RichText.create!(
@@ -145,9 +125,9 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
       end_time: 1.day.ago,
       config: { render_as: "plaintext" }
     )
-    Submission.create!(content: expired_content, feed: feed)
+    Submission.create!(content: expired_content, feed: @feed)
 
-    get frontend_content_url(screen_id: screen.id, field_id: field.id, position_id: position.id)
+    get frontend_content_url(screen_id: @screen.id, field_id: @field.id, position_id: @position.id)
     assert_response :success
 
     data = response.parsed_body
@@ -156,17 +136,7 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should filter out upcoming subscription content" do
-    screen = screens(:one)
-    field = fields(:main)
-    position = positions(:one)
-
-    # Cleanup existing data
-    Subscription.where(screen: screen, field: field).destroy_all
-    FieldConfig.where(screen: screen, field: field).destroy_all
-
-    # Setup feed and subscription
-    feed = Feed.create!(name: "Test Feed", group: groups(:feed_one_owners))
-    Subscription.create!(screen: screen, field: field, feed: feed)
+    setup_subscription_scenario
 
     # Create only upcoming content
     upcoming_content = RichText.create!(
@@ -177,9 +147,9 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
       start_time: 1.hour.from_now,
       config: { render_as: "plaintext" }
     )
-    Submission.create!(content: upcoming_content, feed: feed)
+    Submission.create!(content: upcoming_content, feed: @feed)
 
-    get frontend_content_url(screen_id: screen.id, field_id: field.id, position_id: position.id)
+    get frontend_content_url(screen_id: @screen.id, field_id: @field.id, position_id: @position.id)
     assert_response :success
 
     data = response.parsed_body
@@ -188,17 +158,7 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should return content without start/end times from subscriptions" do
-    screen = screens(:one)
-    field = fields(:main)
-    position = positions(:one)
-
-    # Cleanup existing data
-    Subscription.where(screen: screen, field: field).destroy_all
-    FieldConfig.where(screen: screen, field: field).destroy_all
-
-    # Setup feed and subscription
-    feed = Feed.create!(name: "Test Feed", group: groups(:feed_one_owners))
-    Subscription.create!(screen: screen, field: field, feed: feed)
+    setup_subscription_scenario
 
     # Create content without start/end times (always active)
     always_active_content = RichText.create!(
@@ -208,9 +168,9 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
       duration: 10,
       config: { render_as: "plaintext" }
     )
-    Submission.create!(content: always_active_content, feed: feed)
+    Submission.create!(content: always_active_content, feed: @feed)
 
-    get frontend_content_url(screen_id: screen.id, field_id: field.id, position_id: position.id)
+    get frontend_content_url(screen_id: @screen.id, field_id: @field.id, position_id: @position.id)
     assert_response :success
 
     data = response.parsed_body
@@ -220,6 +180,20 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  def setup_subscription_scenario
+    @screen = screens(:one)
+    @field = fields(:main)
+    @position = positions(:one)
+
+    # Cleanup existing data to avoid fixture interference
+    Subscription.where(screen: @screen, field: @field).destroy_all
+    FieldConfig.where(screen: @screen, field: @field).destroy_all
+
+    # Setup feed and subscription
+    @feed = Feed.create!(name: "Test Feed", group: groups(:feed_one_owners))
+    Subscription.create!(screen: @screen, field: @field, feed: @feed)
+  end
 
   def setup_pinned_content_scenario
     @screen = screens(:one)
