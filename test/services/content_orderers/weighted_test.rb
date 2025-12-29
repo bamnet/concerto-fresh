@@ -50,24 +50,24 @@ class ContentOrderers::WeightedTest < ActiveSupport::TestCase
     content2 = graphics(:two)
     content3 = rich_texts(:active_ticker_text)
 
-    # Create subscriptions with different weights
+    # Create subscriptions with extreme weight differences
     sub_high = Subscription.new(
       screen: screens(:one),
       field: fields(:main),
       feed: feeds(:one),
-      weight: 8
+      weight: 10  # Maximum weight
     )
     sub_low = Subscription.new(
       screen: screens(:one),
       field: fields(:main),
       feed: feeds(:two),
-      weight: 2
+      weight: 1  # Minimum weight
     )
     sub_medium = Subscription.new(
       screen: screens(:one),
       field: fields(:main),
       feed: feeds(:one),
-      weight: 4
+      weight: 5  # Default weight
     )
 
     items = [
@@ -85,14 +85,14 @@ class ContentOrderers::WeightedTest < ActiveSupport::TestCase
     assert_includes result.map(&:id), content3.id
 
     # Higher weighted content should appear more frequently in the list
-    # With weights 8, 4, 2, we expect content1 to appear most often
+    # With weights 10, 5, 1, we expect content1 to appear most often
     content1_count = result.count { |c| c.id == content1.id }
     content2_count = result.count { |c| c.id == content2.id }
     content3_count = result.count { |c| c.id == content3.id }
 
-    # Verify ordering: content1 (weight 8) >= content3 (weight 4) >= content2 (weight 2)
-    assert content1_count >= content3_count, "Expected content1 (weight 8) to appear at least as often as content3 (weight 4)"
-    assert content3_count >= content2_count, "Expected content3 (weight 4) to appear at least as often as content2 (weight 2)"
+    # Verify ordering: content1 (weight 10) >= content3 (weight 5) >= content2 (weight 1)
+    assert content1_count >= content3_count, "Expected content1 (weight 10) to appear at least as often as content3 (weight 5)"
+    assert content3_count >= content2_count, "Expected content3 (weight 5) to appear at least as often as content2 (weight 1)"
   end
 
   test "removes consecutive duplicates" do

@@ -220,7 +220,8 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
     get frontend_content_url(screen_id: @screen.id, field_id: @field.id, position_id: @position.id)
     assert_response :success
 
-    # Verify content is returned
+    # Note: This test verifies that the weighted strategy is applied without errors.
+    # It does not verify the actual weighting behavior - that's covered by unit tests.
     assert response.parsed_body.any?
   end
 

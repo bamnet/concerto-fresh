@@ -2,8 +2,6 @@ class Frontend::ContentController < Frontend::ApplicationController
   before_action :set_field_config
 
   def index
-    @screen = Screen.find(params[:screen_id])
-    @field = Field.find(params[:field_id])
     @position = Position.find(params[:position_id])
 
     @content = fetch_pinned_content || fetch_subscription_content
@@ -30,7 +28,7 @@ class Frontend::ContentController < Frontend::ApplicationController
   end
 
   def fetch_subscription_content
-    subscriptions = @screen.subscriptions.where(field_id: @field.id).includes(:feed)
+    subscriptions = @screen.subscriptions.where(field_id: @field.id)
 
     # Build content items with subscription metadata and filter by position compatibility
     content_items = subscriptions.flat_map do |subscription|
@@ -39,8 +37,8 @@ class Frontend::ContentController < Frontend::ApplicationController
       end
     end
 
-    # Apply ordering strategy
-    strategy = @field_config&.ordering_strategy || "random"
+    # Apply ordering strategy (defaults to "random" if no config or blank strategy)
+    strategy = @field_config&.ordering_strategy.presence || "random"
     orderer = ContentOrderers.for(strategy)
     orderer.call(content_items)
   end
