@@ -15,8 +15,8 @@
     </div>
 
     <% if policy(subscription).update? %>
-      <%= form_with(model: [subscription.screen, subscription], data: { controller: "weight-slider" }, class: "flex-shrink-0") do |form| %>
-        <div class="w-40">
+      <%= form_with(model: [subscription.screen, subscription], data: { controller: "weight-slider" }, class: "flex-shrink-0 mr-2") do |form| %>
+        <div class="w-48">
           <div class="flex items-center space-x-2">
             <span class="text-xs text-neutral-500">Low</span>
             <%= form.range_field :weight,

@@ -58,7 +58,9 @@ export default class extends Controller {
     const position = parseInt(this.sliderTarget.value)
     const label = this.labelsValue[position - 1]
 
-    if (label) {
+    // Only show the label for "Normal" (position 3), since "Low" and "High"
+    // are already shown as slider endpoint labels
+    if (label && label !== "Low" && label !== "High") {
       this.labelTarget.textContent = label
       this.labelTarget.classList.remove("invisible")
     } else {
