@@ -3,6 +3,48 @@
 require "test_helper"
 
 class ContentOrderers::WeightedTest < ActiveSupport::TestCase
+  test "duplicates content based on weight with statistical validation" do
+    content1 = rich_texts(:html_richtext)
+    content2 = graphics(:two)
+
+    # Create subscriptions with clear weight difference
+    sub_high = Subscription.new(
+      screen: screens(:one),
+      field: fields(:main),
+      feed: feeds(:one),
+      weight: 6
+    )
+    sub_low = Subscription.new(
+      screen: screens(:one),
+      field: fields(:main),
+      feed: feeds(:two),
+      weight: 2
+    )
+
+    items = [
+      { content: content1, subscription: sub_high },
+      { content: content2, subscription: sub_low }
+    ]
+
+    orderer = ContentOrderers::Weighted.new
+
+    # Run multiple times to verify distribution
+    # With weights 6:2 (3:1 ratio), content1 should appear more often than content2
+    # Note: The remove_consecutive_duplicates step means the actual ratio will be less than 3:1
+    results = 50.times.map { orderer.call(items) }
+    all_content = results.flatten
+
+    content1_count = all_content.count { |c| c.id == content1.id }
+    content2_count = all_content.count { |c| c.id == content2.id }
+
+    # Verify both pieces of content appear
+    assert content1_count > 0, "content1 should appear at least once"
+    assert content2_count > 0, "content2 should appear at least once"
+
+    # Verify content1 (higher weight) appears more often than content2 (lower weight)
+    assert content1_count > content2_count, "Expected content1 (weight 6) to appear more often than content2 (weight 2), got #{content1_count} vs #{content2_count}"
+  end
+
   test "duplicates content based on weight" do
     content1 = rich_texts(:html_richtext)
     content2 = graphics(:two)
