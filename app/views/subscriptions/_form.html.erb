@@ -33,6 +33,27 @@
             } %>
       </div>
 
+      <div class="w-48" data-controller="weight-slider">
+        <%= form.label :weight, "Priority", class: "block text-xs font-medium text-neutral-700 mb-1" %>
+        <div class="flex items-center space-x-2">
+          <span class="text-xs text-neutral-500">Low</span>
+          <%= form.range_field :weight,
+              min: 1,
+              max: 5,
+              value: 3,
+              class: "flex-1 h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-brand",
+              data: {
+                weight_slider_target: "slider",
+                action: "input->weight-slider#handleSliderChange"
+              } %>
+          <span class="text-xs text-neutral-500">High</span>
+        </div>
+        <%= form.hidden_field :weight, value: 5, data: { weight_slider_target: "weightInput" } %>
+        <p class="text-xs text-neutral-500 mt-1 text-center">
+          <span data-weight-slider-target="label">Normal</span>
+        </p>
+      </div>
+
       <div class="flex-shrink-0">
         <%= form.submit "Add", class: "btn-primary h-8 px-3 text-sm font-medium rounded-md" %>
       </div>
