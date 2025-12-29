@@ -147,11 +147,11 @@
                   <%= fc.label :ordering_strategy, "Content Ordering", class: "block text-sm font-medium text-gray-700 mb-2" %>
                   <%= fc.select :ordering_strategy,
                       options_for_select(
-                        [
-                          ["Random (Default)", "random"],
-                          ["Weighted by Priority", "weighted"],
-                          ["Strict Priority", "strict_priority"]
-                        ],
+                        ContentOrderers::STRATEGIES.keys.map do |strategy|
+                          label = strategy.titleize
+                          label += " (Default)" if strategy == "random"
+                          [label, strategy]
+                        end,
                         field_config.ordering_strategy.presence || "random"
                       ),
                       {},

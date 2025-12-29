@@ -31,7 +31,7 @@ export default class extends Controller {
 
     this.weightsValue.forEach((w, index) => {
       const difference = Math.abs(w - weight)
-      if (difference < minDifference) {
+      if (difference <= minDifference) {
         minDifference = difference
         closestPosition = index + 1 // positions are 1-indexed
       }

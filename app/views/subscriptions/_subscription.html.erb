@@ -19,7 +19,7 @@
         <div class="w-48">
           <div class="flex items-center space-x-2">
             <span class="text-xs text-neutral-500">Low</span>
-            <%= form.range_field :weight,
+            <%= range_field_tag nil, nil,
                 min: 1,
                 max: 5,
                 class: "flex-1 h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-brand",
@@ -29,7 +29,7 @@
                 } %>
             <span class="text-xs text-neutral-500">High</span>
           </div>
-          <%= form.hidden_field :weight, data: { weight_slider_target: "weightInput" } %>
+          <%= form.hidden_field :weight, value: subscription.weight, data: { weight_slider_target: "weightInput" } %>
           <p class="text-xs text-neutral-500 mt-0.5 text-center">
             <span data-weight-slider-target="label"></span>
           </p>
