@@ -6,7 +6,12 @@ class FieldConfig < ApplicationRecord
   belongs_to :pinned_content, class_name: "Content", optional: true
 
   validates :screen_id, uniqueness: { scope: :field_id, message: "already has a config for this field" }
+  validates :ordering_strategy, inclusion: { in: ->(_) { ContentOrderers::STRATEGIES.keys } }, allow_nil: true
   validate :field_belongs_to_template
+
+  def ordering_strategy
+    super || "random"
+  end
 
   private
 

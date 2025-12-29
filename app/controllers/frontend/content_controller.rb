@@ -4,33 +4,42 @@ class Frontend::ContentController < Frontend::ApplicationController
     @field = Field.find(params[:field_id])
     @position = Position.find(params[:position_id])
 
-    @content = []
-
-    # Check for active pinned content
-    # TODO: Refactor this when Content objects support a method to check if they are active or not.
-    field_config = FieldConfig.find_by(screen: @screen, field: @field)
-    if field_config&.pinned_content_id
-      pinned = Content.active.find_by(id: field_config.pinned_content_id)
-      @content = [ pinned ] if pinned
-    end
-
-    # Fallback to subscriptions if no active pinned content
-    if @content.empty?
-      @subscriptions = @screen.subscriptions.where(field_id: @field.id).to_a
-      @content = @subscriptions.flat_map do |subscription|
-        subscription.contents.active
-      end
-
-      # Remove content which should not be rendered in this position.
-      # For example, a 4:3 graphic should probably not be rendered in a
-      # long horizontal ticker field.
-      @content.delete_if do |c|
-        !c.should_render_in?(@position)
-      end
-    end
+    @content = fetch_pinned_content || fetch_subscription_content
 
     logger.debug "Found #{@content.count} content to render in #{@screen.name}'s #{@field.name} field"
 
     render json: @content
+  end
+
+  private
+
+  def field_config
+    @field_config ||= FieldConfig.find_by(screen: @screen, field: @field)
+  end
+
+  def fetch_pinned_content
+    return nil unless field_config&.pinned_content_id
+
+    pinned = Content.active.find_by(id: field_config.pinned_content_id)
+    [ pinned ] if pinned
+  end
+
+  def fetch_subscription_content
+    subscriptions = @screen.subscriptions.where(field_id: @field.id).includes(:feed)
+
+    # Build content items with subscription metadata
+    content_items = subscriptions.flat_map do |subscription|
+      subscription.contents.active.map do |content|
+        { content: content, subscription: subscription }
+      end
+    end
+
+    # Apply ordering strategy
+    strategy = field_config&.ordering_strategy || "random"
+    orderer = ContentOrderers.for(strategy)
+    ordered_content = orderer.call(content_items)
+
+    # Filter by position compatibility
+    ordered_content.select { |c| c.should_render_in?(@position) }
   end
 end
