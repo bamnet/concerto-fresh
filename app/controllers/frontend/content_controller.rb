@@ -37,8 +37,8 @@ class Frontend::ContentController < Frontend::ApplicationController
       end
     end
 
-    # Apply ordering strategy (defaults to "random" if no config or blank strategy)
-    strategy = @field_config&.ordering_strategy.presence || "random"
+    # Apply ordering strategy (defaults to "weighted" if no config or blank strategy)
+    strategy = @field_config&.ordering_strategy.presence || "weighted"
     orderer = ContentOrderers.for(strategy)
     orderer.call(content_items)
   end
