@@ -179,7 +179,7 @@ class Frontend::ContentControllerTest < ActionDispatch::IntegrationTest
     assert_equal always_active_content.id, data.first["id"]
   end
 
-  test "should use weighted ordering by default" do
+  test "should use random ordering by default" do
     setup_subscription_scenario
 
     content1 = RichText.create!(

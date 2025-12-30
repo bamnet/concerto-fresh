@@ -8,6 +8,6 @@ module ContentOrderers
   }.freeze
 
   def self.for(strategy_name)
-    STRATEGIES.fetch(strategy_name, STRATEGIES["weighted"]).new
+    STRATEGIES.fetch(strategy_name, STRATEGIES["random"]).new
   end
 end
