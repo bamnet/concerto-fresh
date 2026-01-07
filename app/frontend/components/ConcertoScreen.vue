@@ -15,6 +15,9 @@ const backgroundImage = ref("");
 const positions = ref([]);
 let loadConfigRetryTimer = null;
 
+// Track config version to detect changes
+const initialConfigVersion = ref(null);
+
 const backgroundImageStyle = computed(() => {
   return `url(${backgroundImage.value})`;
 });
@@ -28,6 +31,24 @@ async function loadConfig(retryCount = 0) {
 
     if (!resp.ok) {
       throw new Error(`HTTP error! status: ${resp.status}`);
+    }
+
+    const newConfigVersion = resp.headers.get('X-Config-Version');
+
+    // Check for config version changes (but not on initial load)
+    if (initialConfigVersion.value !== null &&
+        newConfigVersion !== initialConfigVersion.value) {
+      console.log('[Screen] Config version changed, reloading page...', {
+        old: initialConfigVersion.value,
+        new: newConfigVersion
+      });
+      window.location.reload();
+      return;
+    }
+
+    // Store initial version on first successful load
+    if (initialConfigVersion.value === null) {
+      initialConfigVersion.value = newConfigVersion;
     }
 
     const screen = await resp.json();

@@ -21,6 +21,9 @@ const INITIAL_RETRY_DELAY_MS = 1000;
 const MAX_RETRY_DELAY_MS = 10000;
 const LONG_RETRY_DELAY_MS = 60000;
 
+// Track config version to detect changes
+const configVersion = ref(null);
+
 const contentTypeMap = new Map([
   ["Graphic", ConcertoGraphic],
   ["RichText", ConcertoRichText],
@@ -69,6 +72,24 @@ async function loadContent(retryCount = 0) {
 
     if (!resp.ok) {
       throw new Error(`HTTP error! status: ${resp.status}`);
+    }
+
+    const newConfigVersion = resp.headers.get('X-Config-Version');
+
+    // Check for config version changes (but not on initial load)
+    if (configVersion.value !== null &&
+        newConfigVersion !== configVersion.value) {
+      console.log('[Field] Config version changed, reloading page...', {
+        old: configVersion.value,
+        new: newConfigVersion
+      });
+      window.location.reload();
+      return;
+    }
+
+    // Store initial version on first successful load
+    if (configVersion.value === null) {
+      configVersion.value = newConfigVersion;
     }
 
     const contents = await resp.json();
