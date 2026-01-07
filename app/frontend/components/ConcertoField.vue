@@ -5,6 +5,7 @@ import ConcertoGraphic, { preload as preloadGraphic } from './ConcertoGraphic.vu
 import ConcertoRichText from './ConcertoRichText.vue';
 import ConcertoVideo from './ConcertoVideo.vue';
 import ConcertoClock from './ConcertoClock.vue';
+import { useConfigVersion } from '../composables/useConfigVersion.js';
 
 // Content is shown for 10 seconds if it does not have it's own duration.
 const defaultDuration = 10;
@@ -22,7 +23,7 @@ const MAX_RETRY_DELAY_MS = 10000;
 const LONG_RETRY_DELAY_MS = 60000;
 
 // Track config version to detect changes
-const configVersion = ref(null);
+const { check: checkConfigVersion } = useConfigVersion('Field');
 
 const contentTypeMap = new Map([
   ["Graphic", ConcertoGraphic],
@@ -74,22 +75,9 @@ async function loadContent(retryCount = 0) {
       throw new Error(`HTTP error! status: ${resp.status}`);
     }
 
-    const newConfigVersion = resp.headers.get('X-Config-Version');
-
-    // Check for config version changes (but not on initial load)
-    if (configVersion.value !== null &&
-        newConfigVersion !== configVersion.value) {
-      console.log('[Field] Config version changed, reloading page...', {
-        old: configVersion.value,
-        new: newConfigVersion
-      });
-      window.location.reload();
-      return;
-    }
-
-    // Store initial version on first successful load
-    if (configVersion.value === null) {
-      configVersion.value = newConfigVersion;
+    // Check for config version changes and reload if needed
+    if (checkConfigVersion(resp)) {
+      return; // Stop processing since page is reloading
     }
 
     const contents = await resp.json();
