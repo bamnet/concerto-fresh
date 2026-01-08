@@ -1,11 +1,12 @@
 <script setup>
-import { onMounted, onBeforeUnmount, ref, shallowRef } from 'vue'
+import { onMounted, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 
 import ConcertoGraphic, { preload as preloadGraphic } from './ConcertoGraphic.vue';
 import ConcertoRichText from './ConcertoRichText.vue';
 import ConcertoVideo from './ConcertoVideo.vue';
 import ConcertoClock from './ConcertoClock.vue';
 import { useConfigVersion } from '../composables/useConfigVersion.js';
+import { fetchWithTimeout, TIMEOUTS } from '../utils/fetchWithTimeout.js';
 
 // Content is shown for 10 seconds if it does not have it's own duration.
 const defaultDuration = 10;
@@ -55,6 +56,12 @@ const props = defineProps({
    * This is often used to set font family and color to align with the template.
    */
   fieldStyle: {type: String, required: false, default: ''},
+
+  /**
+   * Network connectivity status from parent component.
+   * Used to optimize retry behavior when offline.
+   */
+  isOnline: {type: Boolean, required: false, default: true},
 });
 
 const currentContent = shallowRef(null);
@@ -64,12 +71,31 @@ const contentQueue = [];
 let nextContentTimer = null;
 let loadContentRetryTimer = null;
 
+// Watch for network recovery and trigger content refresh
+watch(() => props.isOnline, (online, wasOnline) => {
+  if (online && !wasOnline) {
+    console.log('[Field] Network restored, refreshing content');
+    clearTimeout(loadContentRetryTimer);
+    // Only reload if queue is empty (don't interrupt current playback)
+    if (contentQueue.length === 0) {
+      loadContent(0);
+    }
+  }
+});
+
 async function loadContent(retryCount = 0) {
   const maxRetries = 3;
   const retryDelay = Math.min(INITIAL_RETRY_DELAY_MS * Math.pow(2, retryCount), MAX_RETRY_DELAY_MS);
 
+  // Skip fetch attempts if we know we're offline (service worker will handle cached responses)
+  if (!props.isOnline && retryCount > 0) {
+    console.debug('[Field] Offline, delaying retry');
+    loadContentRetryTimer = setTimeout(() => loadContent(retryCount), LONG_RETRY_DELAY_MS);
+    return;
+  }
+
   try {
-    const resp = await fetch(props.apiUrl);
+    const resp = await fetchWithTimeout(props.apiUrl, { timeout: TIMEOUTS.API });
 
     if (!resp.ok) {
       throw new Error(`HTTP error! status: ${resp.status}`);
