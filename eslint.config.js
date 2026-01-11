@@ -22,5 +22,20 @@ export default [
         ...globals.browser
       }
     }
+  },
+  {
+    // Test files configuration
+    files: ['test/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node
+      }
+    },
+    rules: {
+      // Allow multiple Vue components in test files
+      'vue/one-component-per-file': 'off',
+      // Allow reassigning global in tests (for mocking)
+      'no-redeclare': 'off'
+    }
   }
 ]

@@ -23,7 +23,7 @@ describe('ConcertoGraphic.preload', () => {
 
   beforeEach(() => {
     // Mock Image constructor to simulate successful load
-    // eslint-disable-next-line no-undef
+     
     global.Image = class {
       constructor() {
         setTimeout(() => {
@@ -60,7 +60,7 @@ describe('ConcertoGraphic.preload', () => {
   });
 
   it('resolves even when image fails to load', async () => {
-    // eslint-disable-next-line no-undef
+     
     global.Image = class {
       set src(value) { imageSrc = value; }
       set onload(callback) { imageLoadCallback = callback; }
@@ -95,7 +95,7 @@ describe('ConcertoGraphic.preload', () => {
   it('times out after 30 seconds', async () => {
     vi.useFakeTimers();
 
-    // eslint-disable-next-line no-undef
+     
     global.Image = class {
       set src(value) { imageSrc = value; }
       set onload(callback) { /* Never call */ }
