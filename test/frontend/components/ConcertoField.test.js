@@ -199,7 +199,7 @@ describe('ConcertoField', () => {
 
     beforeAll(() => {
       // Mock Image constructor to track preloaded images
-      // eslint-disable-next-line no-undef
+       
       global.Image = class {
         set src(value) {
           preloadedImages.push(value);
@@ -274,7 +274,7 @@ describe('ConcertoField', () => {
 
     it('handles preload errors gracefully', async () => {
       // Mock Image to always fail
-      // eslint-disable-next-line no-undef
+       
       global.Image = class {
         set src(value) {
           preloadedImages.push(value);

@@ -14,29 +14,42 @@ export function useWakeLock() {
   const isSupported = ref(false);
   const isActive = ref(false);
   let wakeLock = null;
+  let isRequesting = false;
+
+  /**
+   * Handler for wake lock release events.
+   */
+  const handleRelease = () => {
+    console.log('[WakeLock] Screen wake lock released');
+    isActive.value = false;
+    wakeLock = null;
+  };
 
   /**
    * Requests a screen wake lock from the browser.
+   * Prevents overlapping requests to avoid race conditions.
    * @returns {Promise<void>}
    */
   const requestWakeLock = async () => {
-    if (!('wakeLock' in navigator)) {
+    // Prevent overlapping requests
+    if (isRequesting || wakeLock !== null) {
       return;
     }
 
+    isRequesting = true;
     try {
       wakeLock = await navigator.wakeLock.request('screen');
       isActive.value = true;
       console.log('[WakeLock] Screen wake lock acquired');
 
       // Listen for wake lock release (can happen if tab becomes inactive)
-      wakeLock.addEventListener('release', () => {
-        console.log('[WakeLock] Screen wake lock released');
-        isActive.value = false;
-      });
+      wakeLock.addEventListener('release', handleRelease);
     } catch (err) {
       console.error('[WakeLock] Failed to acquire wake lock:', err);
       isActive.value = false;
+      wakeLock = null;
+    } finally {
+      isRequesting = false;
     }
   };
 
@@ -46,12 +59,17 @@ export function useWakeLock() {
    */
   const releaseWakeLock = async () => {
     if (wakeLock !== null) {
+      // Remove event listener to prevent memory leak
+      wakeLock.removeEventListener('release', handleRelease);
+
       try {
         await wakeLock.release();
-        wakeLock = null;
-        isActive.value = false;
       } catch (err) {
         console.error('[WakeLock] Failed to release wake lock:', err);
+      } finally {
+        // Ensure state is reset even if release fails
+        wakeLock = null;
+        isActive.value = false;
       }
     }
   };
