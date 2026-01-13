@@ -1,10 +1,8 @@
-class Frontend::PwaController < ApplicationController
+class Frontend::PwaController < Frontend::ApplicationController
   before_action :set_screen
 
   def manifest
-    respond_to do |format|
-      format.json { render template: "frontend/pwa/manifest", layout: false }
-    end
+    render template: "frontend/pwa/manifest", layout: false
   end
 
   private
