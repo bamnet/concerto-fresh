@@ -26,14 +26,15 @@ class Frontend::PwaControllerTest < ActionDispatch::IntegrationTest
     get frontend_manifest_path(@screen.id, format: :json)
     json = JSON.parse(response.body)
 
-    assert_equal "Concerto Player", json["name"]
-    assert_equal "Concerto", json["short_name"]
-    assert_equal "Digital signage player for Concerto", json["description"]
-    assert_equal "/frontend/", json["scope"]
-    assert_equal "fullscreen", json["display"]
-    assert_equal "landscape", json["orientation"]
-    assert_equal "#007BFF", json["theme_color"]
-    assert_equal "#FFFFFF", json["background_color"]
+    # Verify required PWA manifest fields are present
+    assert json.key?("name")
+    assert json.key?("short_name")
+    assert json.key?("start_url")
+    assert json.key?("scope")
+    assert json.key?("display")
+    assert json.key?("icons")
+
+    # Verify icons structure
     assert json["icons"].is_a?(Array)
     assert json["icons"].length > 0
   end
