@@ -303,6 +303,7 @@ describe('useWakeLock', () => {
         '[Wake Lock] Error releasing wake lock:',
         expect.any(Error)
       );
+      expect(wrapper.vm.isActive).toBe(false);
 
       consoleSpy.mockRestore();
     });

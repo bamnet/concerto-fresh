@@ -1,21 +1,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 /**
- * Composable for managing Screen Wake Lock API to prevent display from dimming or turning off.
- *
- * The Wake Lock API is used to keep digital signage displays active during playback.
- * This is critical for screens that are not frequently interacted with, preventing
- * browsers/devices from thinking the page is inactive and turning off the display.
- *
- * Features:
- * - Automatic wake lock acquisition on component mount
- * - Handles visibility changes (releases when hidden, re-acquires when visible)
- * - Graceful fallback for unsupported browsers
- * - Clean resource management
- *
- * Browser support:
- * - Chrome/Edge 84+, Safari 16.4+, Chrome Android, Safari iOS 16.4+
- * - Not supported: Firefox (as of Jan 2025)
+ * Composable for managing Screen Wake Lock API to prevent display from turning off.
  *
  * @returns {Object} Object with reactive state properties
  * @returns {Ref<boolean>} isActive - Whether wake lock is currently active
@@ -24,7 +10,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
  */
 export function useWakeLock() {
   const isActive = ref(false)
-  const isSupported = ref(false)
+  const isSupported = ref('wakeLock' in navigator)
   const error = ref(null)
 
   let wakeLock = null
@@ -38,13 +24,10 @@ export function useWakeLock() {
     error.value = null
 
     // Check if Wake Lock API is supported
-    if (!('wakeLock' in navigator)) {
-      isSupported.value = false
+    if (!isSupported.value) {
       console.warn('[Wake Lock] Screen Wake Lock API is not supported in this browser')
       return
     }
-
-    isSupported.value = true
 
     // Check if page is visible (required for wake lock acquisition)
     if (document.visibilityState !== 'visible') {
@@ -76,12 +59,12 @@ export function useWakeLock() {
     if (wakeLock) {
       try {
         await wakeLock.release()
-        wakeLock = null
-        isActive.value = false
         console.log('[Wake Lock] Screen wake lock released manually')
       } catch (err) {
         console.warn('[Wake Lock] Error releasing wake lock:', err)
       }
+      wakeLock = null
+      isActive.value = false
     }
   }
 
