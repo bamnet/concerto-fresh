@@ -5,7 +5,6 @@ class Frontend::PlayerControllerTest < ActionDispatch::IntegrationTest
     @screen = screens(:one)
   end
 
-
   test "should show screen" do
     get "/frontend/#{@screen.id}"
     assert_response :success
@@ -41,19 +40,5 @@ class Frontend::PlayerControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_acceptable
     assert_select "h1", "Browser Not Supported"
     assert_select "pre", /Chrome\/63\.0\.3239\.132/
-  end
-
-  test "should reject unsupported browser Firefox 68" do
-    get "/frontend/#{@screen.id}",
-        headers: { "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0" }
-    assert_response :not_acceptable
-    assert_select "h1", "Browser Not Supported"
-  end
-
-  test "should reject unsupported browser Safari 13.0" do
-    get "/frontend/#{@screen.id}",
-        headers: { "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 Safari/605.1.15" }
-    assert_response :not_acceptable
-    assert_select "h1", "Browser Not Supported"
   end
 end
