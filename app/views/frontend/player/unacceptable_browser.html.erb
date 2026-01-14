@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Browser Not Supported - Concerto Player</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta charset="utf-8">
+  </head>
+  <body style="
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  ">
+    <div style="
+      max-width: 900px;
+      padding: 60px 40px;
+      text-align: center;
+    ">
+      <h1 style="
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin: 0 0 30px 0;
+        color: #ff6b6b;
+        line-height: 1.2;
+      ">Browser Not Supported</h1>
+
+      <p style="
+        font-size: 2rem;
+        line-height: 1.6;
+        margin: 0 0 40px 0;
+        color: #e0e0e0;
+      ">
+        Your browser version is too old to display this content.
+        Please update your browser or device software.
+      </p>
+
+      <div style="
+        background-color: #2a2a2a;
+        border-radius: 8px;
+        padding: 40px;
+        margin: 0 0 40px 0;
+        text-align: left;
+      ">
+        <h2 style="
+          font-size: 2.2rem;
+          font-weight: 600;
+          margin: 0 0 25px 0;
+          color: #ffffff;
+        ">Minimum Requirements</h2>
+
+        <ul style="
+          font-size: 1.8rem;
+          line-height: 1.8;
+          margin: 0;
+          padding-left: 30px;
+          color: #e0e0e0;
+        ">
+          <li style="margin-bottom: 15px;">Chrome 64 or newer</li>
+          <li style="margin-bottom: 15px;">Firefox 69 or newer</li>
+          <li style="margin-bottom: 15px;">Safari 13.1 or newer</li>
+          <li style="margin-bottom: 15px;">Edge 79 or newer (Chromium-based)</li>
+        </ul>
+      </div>
+
+      <div style="
+        background-color: #2a2a2a;
+        border-radius: 8px;
+        padding: 40px;
+        margin: 0 0 40px 0;
+        text-align: left;
+      ">
+        <h2 style="
+          font-size: 2.2rem;
+          font-weight: 600;
+          margin: 0 0 25px 0;
+          color: #ffffff;
+        ">Technical Details</h2>
+
+        <p style="
+          font-size: 1.5rem;
+          margin: 0 0 15px 0;
+          color: #a0a0a0;
+        ">For bug reports, please include this information:</p>
+
+        <pre style="
+          font-size: 1.4rem;
+          line-height: 1.6;
+          margin: 0;
+          padding: 20px;
+          background-color: #1a1a1a;
+          border-radius: 4px;
+          color: #00ff88;
+          overflow-wrap: break-word;
+          white-space: pre-wrap;
+          word-break: break-all;
+        "><%= request.user_agent %></pre>
+      </div>
+
+      <div style="
+        font-size: 1.6rem;
+        color: #a0a0a0;
+      ">
+        <p style="margin: 0 0 10px 0;">Need help or think this is a mistake?</p>
+        <a href="https://github.com/bamnet/concerto-fresh/issues" style="
+          color: #007BFF;
+          text-decoration: none;
+          font-weight: 600;
+        ">Report an issue on GitHub</a>
+      </div>
+    </div>
+  </body>
+</html>
