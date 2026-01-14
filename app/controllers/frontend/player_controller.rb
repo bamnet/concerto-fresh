@@ -1,12 +1,7 @@
 class Frontend::PlayerController < ActionController::Base
-  # Support older browsers for embedded devices (Smart TVs, kiosks, etc.)
-  # Edge 79+ is Chromium-based; earlier versions used EdgeHTML which is incompatible
-  allow_browser versions: {
-    chrome: 64,
-    firefox: 69,
-    safari: 13.1,
-    edge: 79
-  }, block: -> {
+  # The player supports older browsers which are compatible with its features.
+  # This should be kept in-sync with vite.config.js's build targets.
+  allow_browser versions: { chrome: 64, firefox: 69, safari: 13.1, opera: 51, ie: false }, block: -> {
     render "frontend/player/unacceptable_browser", status: :not_acceptable, layout: false
   }
 
