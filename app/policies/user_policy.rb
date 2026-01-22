@@ -1,9 +1,11 @@
 class UserPolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
-    # All signed-in users can see all users
     def resolve
       return scope.none unless user
-      scope.all
+
+      # Users can only see their own profile, system admins can see all
+      return scope.all if user.system_admin?
+      scope.where(id: user.id)
     end
   end
 
@@ -13,8 +15,8 @@ class UserPolicy < ApplicationPolicy
   end
 
   def show?
-    # Only signed-in users can view user profiles
-    user.present?
+    # Only the user themselves or system admins can view profiles
+    super || can_edit_user?
   end
 
   def new?
@@ -37,6 +39,16 @@ class UserPolicy < ApplicationPolicy
 
   def destroy?
     super || can_edit_user?
+  end
+
+  def permitted_attributes
+    # Users can only update their own basic profile information
+    # System admins can update any user fields
+    if user&.system_admin?
+      [ :first_name, :last_name, :email, :is_system_user ]
+    else
+      [ :first_name, :last_name, :email ]
+    end
   end
 
   private
