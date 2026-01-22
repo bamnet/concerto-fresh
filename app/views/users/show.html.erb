@@ -2,19 +2,19 @@
 
 <div class="flex items-center justify-between mb-6">
   <div class="flex items-center">
-    <div class="h-16 w-16 rounded-full flex items-center justify-center text-white font-medium bg-gradient-to-br from-brand to-brand-600 text-2xl mr-6">
+    <div class="h-16 w-16 rounded-full flex items-center justify-center text-white font-medium bg-gradient-to-br from-brand to-brand-600 text-2xl mr-8">
       <%= user_initials(@user) %>
     </div>
     <div>
-      <div class="flex items-center mb-1">
+      <div class="flex items-center gap-2 mb-1">
         <h1 class="text-h2 text-neutral-900"><%= @user.display_name %></h1>
         <% if @user.is_system_user %>
-          <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-800">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-neutral-200 text-neutral-800 border border-neutral-300">
             System User
           </span>
         <% end %>
         <% if @user.system_admin? %>
-          <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-600">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-600 text-white shadow-sm">
             System Administrator
           </span>
         <% end %>
