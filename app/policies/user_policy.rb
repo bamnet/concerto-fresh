@@ -1,11 +1,9 @@
 class UserPolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
+    # All signed-in users can see all users
     def resolve
       return scope.none unless user
-
-      # Users can only see their own profile, system admins can see all
-      return scope.all if user.system_admin?
-      scope.where(id: user.id)
+      scope.all
     end
   end
 
@@ -15,8 +13,8 @@ class UserPolicy < ApplicationPolicy
   end
 
   def show?
-    # Only the user themselves or system admins can view profiles
-    super || can_edit_user?
+    # Only signed-in users can view user profiles
+    user.present?
   end
 
   def new?

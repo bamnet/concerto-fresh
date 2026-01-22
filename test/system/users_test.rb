@@ -67,12 +67,12 @@ class UsersTest < ApplicationSystemTestCase
     assert_current_path root_path
   end
 
-  test "cannot access other user's profile" do
+  test "can access other user's profile" do
     sign_in @user
     visit user_url(@other_user)
 
-    assert_text "You are not authorized to perform this action"
-    assert_current_path root_path
+    assert_selector "h1", text: @other_user.display_name
+    assert_text @other_user.email
   end
 
   test "system admin can view any user profile" do
@@ -107,14 +107,17 @@ class UsersTest < ApplicationSystemTestCase
   end
 
   test "profile shows empty state when no content" do
-    sign_in @user
-    visit user_url(@user)
+    user_without_content = User.create!(
+      first_name: "No",
+      last_name: "Content",
+      email: "nocontent@example.com",
+      password: "password"
+    )
+    sign_in user_without_content
+    visit user_url(user_without_content)
 
-    # Assuming @user has no content
-    if @user.contents.empty?
-      assert_selector "h3", text: "No content yet"
-      assert_text "This user has not uploaded any content"
-    end
+    assert_selector "h3", text: "No content yet"
+    assert_text "This user has not uploaded any content"
   end
 
   test "profile displays group memberships table" do

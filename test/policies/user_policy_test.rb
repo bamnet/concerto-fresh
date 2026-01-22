@@ -7,13 +7,8 @@ class UserPolicyTest < ActiveSupport::TestCase
     @other_user = users(:admin)
   end
 
-  test "scope returns only self for regular users" do
+  test "scope returns all users for signed-in users" do
     resolved_scope = UserPolicy::Scope.new(@regular_user, User.all).resolve
-    assert_equal [ @regular_user ], resolved_scope.to_a
-  end
-
-  test "scope returns all users for system admins" do
-    resolved_scope = UserPolicy::Scope.new(@system_admin_user, User.all).resolve
     assert_equal User.all.to_a, resolved_scope.to_a
   end
 
@@ -30,16 +25,8 @@ class UserPolicyTest < ActiveSupport::TestCase
     refute UserPolicy.new(nil, User).index?
   end
 
-  test "show? is permitted for user viewing themselves" do
-    assert UserPolicy.new(@regular_user, @regular_user).show?
-  end
-
-  test "show? is permitted for system admin viewing any user" do
-    assert UserPolicy.new(@system_admin_user, @regular_user).show?
-  end
-
-  test "show? is denied for user viewing someone else" do
-    refute UserPolicy.new(@regular_user, @other_user).show?
+  test "show? is permitted for signed-in users" do
+    assert UserPolicy.new(@other_user, @regular_user).show?
   end
 
   test "show? is denied for anonymous users" do

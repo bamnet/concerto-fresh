@@ -8,9 +8,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   # Show action authorization tests
-  test "users can view their own profile" do
+  test "users can view any user profile" do
     sign_in @user
-    get user_url(@user)
+    get user_url(@other_user)
     assert_response :success
   end
 
@@ -20,17 +20,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "users cannot view other user profiles" do
-    sign_in @user
-    get user_url(@other_user)
-    assert_redirected_to root_path
-    assert_equal "You are not authorized to perform this action.", flash[:alert]
-  end
-
   test "unauthenticated users cannot view user profiles" do
     get user_url(@user)
-    assert_redirected_to root_path
-    assert_equal "You are not authorized to perform this action.", flash[:alert]
+    assert_redirected_to new_user_session_path
   end
 
   # Edit action authorization tests
