@@ -80,7 +80,9 @@
                       <%= user_initials(membership.user) %>
                     </div>
                     <div class="ml-3">
-                      <p class="text-body font-medium text-neutral-900"><%= membership.user.full_name %></p>
+                      <p class="text-body font-medium text-neutral-900">
+                        <%= link_to membership.user.full_name, user_path(membership.user), class: "text-brand hover:text-brand-600" %>
+                      </p>
                       <p class="text-caption text-neutral-500"><%= membership.user.email %></p>
                     </div>
                   </div>
