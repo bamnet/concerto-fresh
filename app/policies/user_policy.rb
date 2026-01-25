@@ -39,6 +39,11 @@ class UserPolicy < ApplicationPolicy
     super || can_edit_user?
   end
 
+  # System admins can create users through the admin interface
+  def admin_create?
+    system_admin_only
+  end
+
   private
 
   # A user may only update/destroy themselves (system admins can manage anyone via super)
