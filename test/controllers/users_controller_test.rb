@@ -25,7 +25,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     user = users(:admin)
     get user_url(user)
     assert_response :success
-    assert_select "h1", text: "#{user.display_name} Profile"
+    assert_select "h1", text: user.display_name
   end
 
   test "should show message when user has no content" do
