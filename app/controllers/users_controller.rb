@@ -6,7 +6,7 @@ class UsersController < ApplicationController
 
   # GET /users
   def index
-    @users = policy_scope(User).order(:email)
+    @users = policy_scope(User).includes(:groups).order(:email)
   end
 
   # GET /users/1 or /users/1.json
