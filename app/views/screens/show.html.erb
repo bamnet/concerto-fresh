@@ -7,13 +7,12 @@
       <div>
         <h1 class="text-2xl font-bold text-gray-900"><%= @screen.name %></h1>
         <p class="text-sm text-gray-600 mt-1">Manage screen configuration and feed subscriptions</p>
-      </div>
-      <div class="flex space-x-3">
-        <%= link_to "Manage Subscriptions", screen_subscriptions_path(@screen), class: "btn-primary" %>
-        <% if policy(@screen).edit? %>
-          <%= link_to "Edit Screen", edit_screen_path(@screen), class: "btn-secondary" %>
-        <% end %>
-      </div>
+      </div><div class="flex space-x-3">
+  <% if policy(@screen).edit? %>
+    <%= link_to "Manage Subscriptions", screen_subscriptions_path(@screen), class: "btn-primary" %>
+    <%= link_to "Edit Screen", edit_screen_path(@screen), class: "btn-secondary" %>
+  <% end %>
+</div>
     </div>
   </div>
 
