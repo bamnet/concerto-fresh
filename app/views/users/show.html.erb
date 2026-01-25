@@ -21,7 +21,7 @@
       </div>
     </div>
   </div>
-  <% if current_user&.system_admin? && @user != current_user && !@user.is_system_user %>
+  <% if policy(@user).admin_manage? %>
     <div class="flex items-center space-x-2">
       <%= link_to edit_admin_user_path(@user), class: "btn-secondary" do %>
         <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

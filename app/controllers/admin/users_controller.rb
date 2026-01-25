@@ -24,23 +24,29 @@ module Admin
 
     # GET /admin/users/:id/edit
     def edit
-      authorize @user
+      authorize @user, :admin_manage?
     end
 
     # PATCH/PUT /admin/users/:id
     def update
-      authorize @user
+      authorize @user, :admin_manage?
 
-      if password_provided?
-        update_with_password
+      result = if password_provided?
+        @user.update(user_params)
       else
-        update_without_password
+        @user.update_without_password(user_params.except(:password, :password_confirmation))
+      end
+
+      if result
+        redirect_to user_url(@user), notice: "User was successfully updated."
+      else
+        render :edit, status: :unprocessable_entity
       end
     end
 
     # DELETE /admin/users/:id
     def destroy
-      authorize @user
+      authorize @user, :admin_manage?
 
       if last_system_admin?(@user)
         redirect_to user_url(@user), alert: "Cannot delete the last system administrator."
@@ -62,23 +68,7 @@ module Admin
     end
 
     def password_provided?
-      params[:user][:password].present?
-    end
-
-    def update_with_password
-      if @user.update(user_params)
-        redirect_to user_url(@user), notice: "User was successfully updated."
-      else
-        render :edit, status: :unprocessable_entity
-      end
-    end
-
-    def update_without_password
-      if @user.update_without_password(user_params.except(:password, :password_confirmation))
-        redirect_to user_url(@user), notice: "User was successfully updated."
-      else
-        render :edit, status: :unprocessable_entity
-      end
+      params.dig(:user, :password).present?
     end
 
     def last_system_admin?(user)

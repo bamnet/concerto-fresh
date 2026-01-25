@@ -178,21 +178,63 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "User was successfully deleted.", flash[:notice]
   end
 
-  # --- Last System Admin Protection ---
+  # --- Admin Self-Management Protection ---
 
-  test "should not destroy last system admin" do
-    # Ensure system_admin is the only system admin
-    assert_equal 1, Group.system_admins_group.users.count
+  test "should not allow admin to edit themselves" do
+    get edit_admin_user_url(@system_admin)
+    assert_redirected_to root_url
+    assert_equal "You are not authorized to perform this action.", flash[:alert]
+  end
 
+  test "should not allow admin to update themselves" do
+    patch admin_user_url(@system_admin), params: { user: { first_name: "Updated" } }
+    assert_redirected_to root_url
+    assert_equal "You are not authorized to perform this action.", flash[:alert]
+  end
+
+  test "should not allow admin to destroy themselves" do
     assert_no_difference("User.count") do
       delete admin_user_url(@system_admin)
     end
 
-    assert_redirected_to user_url(@system_admin)
-    assert_equal "Cannot delete the last system administrator.", flash[:alert]
+    assert_redirected_to root_url
+    assert_equal "You are not authorized to perform this action.", flash[:alert]
   end
 
-  test "should allow destroying system admin if there are other system admins" do
+  test "should not allow admin to manage system users" do
+    system_user = users(:system_user)
+
+    get edit_admin_user_url(system_user)
+    assert_redirected_to root_url
+    assert_equal "You are not authorized to perform this action.", flash[:alert]
+  end
+
+  # --- Last System Admin Protection ---
+
+  test "should not destroy last system admin" do
+    # Add another admin who will try to delete the only system admin
+    other_admin = users(:admin)
+    system_admins_group = Group.system_admins_group
+    Membership.create!(user: other_admin, group: system_admins_group, role: :admin)
+
+    # Now sign in as other_admin and try to delete system_admin
+    sign_in other_admin
+
+    # Remove other_admin from system admins group so system_admin is the last one
+    membership = other_admin.memberships.find_by(group: system_admins_group)
+    membership.delete
+    assert_equal 1, Group.system_admins_group.users.count
+
+    # other_admin is no longer a system admin, so they can't delete anyone
+    assert_no_difference("User.count") do
+      delete admin_user_url(@system_admin)
+    end
+
+    assert_redirected_to root_url
+    assert_equal "You are not authorized to perform this action.", flash[:alert]
+  end
+
+  test "should allow admin to destroy another system admin if there are multiple" do
     # Add another user to the system admins group
     other_admin = users(:admin)
     system_admins_group = Group.system_admins_group
@@ -200,8 +242,9 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
 
     assert_operator Group.system_admins_group.users.count, :>, 1
 
+    # system_admin (signed in) deletes other_admin
     assert_difference("User.count", -1) do
-      delete admin_user_url(@system_admin)
+      delete admin_user_url(other_admin)
     end
 
     assert_redirected_to users_url
