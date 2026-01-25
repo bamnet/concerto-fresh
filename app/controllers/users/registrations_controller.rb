@@ -4,7 +4,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   private
 
   def ensure_registration_enabled
-    unless Setting[:public_registration] != false
+    if Setting[:public_registration] == false
       redirect_to new_user_session_path, alert: "Self-registration is currently disabled. Please contact an administrator."
     end
   end
