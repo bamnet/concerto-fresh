@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/mock"
 
 class VideoTest < ActiveSupport::TestCase
   setup do
@@ -6,6 +7,29 @@ class VideoTest < ActiveSupport::TestCase
     @youtube_short = videos(:video_youtube_short)
     @vimeo_video = videos(:video_vimeo) # Assuming a fixture for Vimeo videos exists
     @tiktok_video = videos(:video_tiktok)
+
+    # Mock oEmbed responses to avoid network calls in tests
+    @tiktok_oembed = {
+      "version" => "1.0",
+      "type" => "video",
+      "title" => "Scramble up ur name & I'll try to guess it",
+      "author_url" => "https://www.tiktok.com/@scout2015",
+      "author_name" => "Scout, Suki & Stella",
+      "html" => '<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@scout2015/video/6718335390845095173" data-video-id="6718335390845095173" data-embed-from="oembed" style="max-width:605px; min-width:325px;"></blockquote>',
+      "thumbnail_url" => "https://p19-common-sign.tiktokcdn-us.com/example-thumbnail.jpg",
+      "provider_name" => "TikTok"
+    }
+
+    @vimeo_oembed = {
+      "type" => "video",
+      "version" => "1.0",
+      "provider_name" => "Vimeo",
+      "title" => "Staff Picks Best of the Year 2023",
+      "author_name" => "Vimeo",
+      "html" => '<iframe src="https://player.vimeo.com/video/897211169"></iframe>',
+      "thumbnail_url" => "https://i.vimeocdn.com/video/1987724603-d_295x166",
+      "video_id" => 897211169
+    }
   end
 
   test "should render videos in appropriate fields" do
@@ -36,7 +60,9 @@ class VideoTest < ActiveSupport::TestCase
   end
 
   test "extracts video id from tiktok url" do
-    assert_equal "6718335390845095173", @tiktok_video.video_id
+    @tiktok_video.stub :tiktok_oembed_data, @tiktok_oembed do
+      assert_equal "6718335390845095173", @tiktok_video.video_id
+    end
   end
 
   test "JSON output includes video_id and video_source" do
@@ -48,8 +74,10 @@ class VideoTest < ActiveSupport::TestCase
     assert_equal "897211169", vimeo_json[:video_id] # Replace with the actual Vimeo ID from the fixture
     assert_equal "vimeo", vimeo_json[:video_source]
 
-    tiktok_json = @tiktok_video.as_json
-    assert_equal "6718335390845095173", tiktok_json[:video_id]
-    assert_equal "tiktok", tiktok_json[:video_source]
+    @tiktok_video.stub :tiktok_oembed_data, @tiktok_oembed do
+      tiktok_json = @tiktok_video.as_json
+      assert_equal "6718335390845095173", tiktok_json[:video_id]
+      assert_equal "tiktok", tiktok_json[:video_source]
+    end
   end
 end
