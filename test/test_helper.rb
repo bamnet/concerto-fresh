@@ -28,23 +28,55 @@ module ActiveSupport
 
     # Stub external API requests globally
     setup do
-      # oEmbed APIs
+      # TikTok oEmbed API - response based on actual API data
       stub_request(:get, /tiktok\.com\/oembed/)
         .to_return(
           status: 200,
           body: {
-            "html" => '<blockquote data-video-id="6718335390845095173"></blockquote>',
-            "thumbnail_url" => "https://example.com/tiktok-thumbnail.jpg"
+            "version" => "1.0",
+            "type" => "video",
+            "title" => "Scramble up ur name & I'll try to guess it",
+            "author_url" => "https://www.tiktok.com/@scout2015",
+            "author_name" => "Scout, Suki & Stella",
+            "width" => "100%",
+            "height" => "100%",
+            "html" => '<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@scout2015/video/6718335390845095173" data-video-id="6718335390845095173" data-embed-from="oembed" style="max-width:605px; min-width:325px;"></blockquote>',
+            "thumbnail_url" => "https://p19-common-sign.tiktokcdn-us.com/example-thumbnail.jpg",
+            "thumbnail_width" => 576,
+            "thumbnail_height" => 1024,
+            "provider_url" => "https://www.tiktok.com",
+            "provider_name" => "TikTok",
+            "author_unique_id" => "scout2015",
+            "embed_product_id" => "6718335390845095173",
+            "embed_type" => "video"
           }.to_json,
           headers: { "Content-Type" => "application/json" }
         )
 
+      # Vimeo oEmbed API - response based on actual API data
       stub_request(:get, /vimeo\.com\/api\/oembed\.json/)
         .to_return(
           status: 200,
           body: {
+            "type" => "video",
+            "version" => "1.0",
+            "provider_name" => "Vimeo",
+            "provider_url" => "https://vimeo.com/",
+            "title" => "Staff Picks Best of the Year 2023",
+            "author_name" => "Vimeo",
+            "author_url" => "https://vimeo.com/staff",
+            "is_plus" => "0",
+            "account_type" => "enterprise",
+            "html" => '<iframe src="https://player.vimeo.com/video/897211169"></iframe>',
+            "width" => 426,
+            "height" => 240,
+            "duration" => 34,
+            "description" => "",
+            "thumbnail_url" => "https://i.vimeocdn.com/video/1987724603-d_295x166",
+            "thumbnail_width" => 295,
+            "thumbnail_height" => 166,
             "video_id" => 897211169,
-            "thumbnail_url" => "https://example.com/vimeo-thumbnail.jpg"
+            "uri" => "/videos/897211169"
           }.to_json,
           headers: { "Content-Type" => "application/json" }
         )
