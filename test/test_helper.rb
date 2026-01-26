@@ -26,8 +26,9 @@ module ActiveSupport
       FileUtils.rm_rf(ActiveStorage::Blob.services.fetch(:test_fixtures).root)
     end
 
-    # Stub external API requests globally
-    setup do
+    # Helper to stub oEmbed API requests (TikTok and Vimeo)
+    # Call this in setup blocks of tests that use Video models with external URLs
+    def stub_oembed_apis
       # TikTok oEmbed API - response based on actual API data
       stub_request(:get, /tiktok\.com\/oembed/)
         .to_return(
@@ -80,8 +81,11 @@ module ActiveSupport
           }.to_json,
           headers: { "Content-Type" => "application/json" }
         )
+    end
 
-      # RSS feeds
+    # Helper to stub RSS feed requests
+    # Call this in setup blocks of tests that refresh RSS feeds
+    def stub_rss_feeds
       stub_request(:get, /news\.yahoo\.com\/rss/)
         .to_return(
           status: 200,

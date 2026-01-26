@@ -2,6 +2,7 @@ require "test_helper"
 
 class VideoTest < ActiveSupport::TestCase
   setup do
+    stub_oembed_apis
     @youtube_video = videos(:video_youtube)
     @youtube_short = videos(:video_youtube_short)
     @vimeo_video = videos(:video_vimeo)
