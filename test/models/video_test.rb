@@ -2,10 +2,9 @@ require "test_helper"
 
 class VideoTest < ActiveSupport::TestCase
   setup do
-    stub_oembed_apis
     @youtube_video = videos(:video_youtube)
     @youtube_short = videos(:video_youtube_short)
-    @vimeo_video = videos(:video_vimeo)
+    @vimeo_video = videos(:video_vimeo) # Assuming a fixture for Vimeo videos exists
     @tiktok_video = videos(:video_tiktok)
   end
 
@@ -33,7 +32,7 @@ class VideoTest < ActiveSupport::TestCase
   end
 
   test "extracts video id from vimeo url" do
-    assert_equal "897211169", @vimeo_video.video_id
+    assert_equal "897211169", @vimeo_video.video_id # Replace with the actual Vimeo ID from the fixture
   end
 
   test "extracts video id from tiktok url" do
@@ -46,7 +45,7 @@ class VideoTest < ActiveSupport::TestCase
     assert_equal "youtube", youtube_json[:video_source]
 
     vimeo_json = @vimeo_video.as_json
-    assert_equal "897211169", vimeo_json[:video_id]
+    assert_equal "897211169", vimeo_json[:video_id] # Replace with the actual Vimeo ID from the fixture
     assert_equal "vimeo", vimeo_json[:video_source]
 
     tiktok_json = @tiktok_video.as_json
