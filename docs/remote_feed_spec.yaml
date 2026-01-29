@@ -2,27 +2,14 @@ openapi: 3.1.0
 info:
   title: Concerto Remote Feed
   description: >
-    Specification for a remote feed that provides content to Concerto.
-    Concerto polls this endpoint to retrieve content objects (RichText, Graphic, Video).
+    Schema specification for a remote feed that provides content to Concerto.
+    Concerto polls a user-configured URL to retrieve content objects (RichText, Graphic, Video).
+    The endpoint must return a JSON array of Content objects as described below.
+    The URL path is not prescribed — any URL returning this format will work
+    (e.g. https://example.com/feed_contents.json).
   version: 0.0.0
 
-paths:
-  /contents:
-    get:
-      summary: List content items
-      description: >
-        Returns an array of content objects currently available in the feed.
-        Each item is one of RichText, Graphic, or Video.
-      operationId: listContents
-      responses:
-        "200":
-          description: A list of content items.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Content"
+paths: {}
 
 components:
   schemas:
