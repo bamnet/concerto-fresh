@@ -74,11 +74,7 @@ class RemoteFeedsController < ApplicationController
       if current_user.system_admin?
         @groups = Group.all
       else
-        @groups = if @remote_feed&.persisted?
-          (current_user.admin_groups + [ @remote_feed.group ]).compact.uniq
-        else
-          current_user.admin_groups
-        end
+        @groups = (current_user.admin_groups + [ @remote_feed&.group ]).compact.uniq.sort_by(&:name)
       end
     end
 
