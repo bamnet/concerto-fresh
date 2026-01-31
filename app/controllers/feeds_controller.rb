@@ -1,6 +1,7 @@
 class FeedsController < ApplicationController
   before_action :set_feed, only: %i[ show edit update destroy ]
   before_action :redirect_sti_feed, only: %i[ show edit ]
+  before_action :block_sti_modification, only: %i[ update destroy ]
   before_action :set_form_options, only: %i[ new edit create update ]
 
   after_action :verify_authorized, except: :index
@@ -81,9 +82,20 @@ class FeedsController < ApplicationController
 
     # Redirects to the appropriate STI controller if the feed is not of the base Feed class.
     def redirect_sti_feed
+      authorize @feed # Auth first to avoid leaking existence of the feed.
+
       if @feed.class != Feed
         target = (action_name == "edit") ? [ :edit, @feed ] : @feed
         redirect_to(polymorphic_path(target, format: (request.format.symbol unless request.format.html?)), status: :moved_permanently)
+      end
+    end
+
+    # Blocks updates or deletions of STI subclassed feeds via the base Feed controller.
+    def block_sti_modification
+      authorize @feed
+
+      if @feed.class != Feed
+        head :method_not_allowed
       end
     end
 
